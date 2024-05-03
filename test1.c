@@ -152,6 +152,8 @@ void InitGame(void)
 {
     // Initialize game variables
     //射擊頻率、是否暫停、遊戲是否結束、是否勝利、當前的敵人波次、活躍的敵人數量、殺敵數量、分數和透明度
+    // PartnerType chosenType = SelectPartnerType();
+    
     shootRate = 0;
     pause = false;
     gameOver = false;
@@ -173,7 +175,9 @@ void InitGame(void)
     player.speed.y = 5;
     player.color = BLACK;
     
-    InitPartner(&partner, (Vector2){ player.rec.x, player.rec.y });
+    int chosenType = 0;
+    InitPartner(&partner, (Vector2){ player.rec.x, player.rec.y }, chosenType);
+    // InitPartner(&partner, (Vector2){ player.rec.x, player.rec.y });
 
     // Initialize enemies
     // 通過迴圈初始化每個敵人的大小、隨機位置、速度、激活狀態和顏色。

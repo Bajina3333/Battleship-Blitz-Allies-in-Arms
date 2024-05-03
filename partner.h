@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 #include "type.h"
+// #include "raygui.h"
 
 // 夥伴結構定義
 // typedef struct Partner {
@@ -15,9 +16,10 @@
 // } Partner;
 
 // 夥伴相關函數宣告
-void InitPartner(Partner *partner, Vector2 playerPosition);
+void InitPartner(Partner *partner, Vector2 playerPosition, PartnerType type);
 void UpdatePartner(Partner *partner, Vector2 playerPosition);
 void DrawPartner(Partner *partner);
 bool CheckPartnerCollisionRecs(Partner *partner, Enemy *enemy);
+PartnerType SelectPartnerType();
 
 #endif
