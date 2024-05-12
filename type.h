@@ -19,6 +19,7 @@ typedef struct Enemy {
     Rectangle rec;
     Vector2 speed;
     bool active;
+    int attackPower;
     Color color;
 } Enemy;
 
@@ -30,6 +31,7 @@ typedef struct Shoot {
     Color color;
 } Shoot;
 
+//////////////////////////////////
 // 夥伴結構
 // typedef struct Partner {
     // Rectangle rec;
@@ -48,13 +50,25 @@ typedef enum {
 typedef struct Partner {
     Rectangle rec;
     int health;
+    int maxHealth;
     int attackPower;
     float attackRate;
     bool active;
-    float attackTimer;
+    // float attackTimer;
+    float hitCooldown;  // 用于受击冷却
+    float lastHitTime;  // 上次被攻击的时间
     PartnerType type;  // 添加一个类型字段
 } Partner;
 
+// typedef struct Shoot {
+    // Rectangle rec;
+    // Vector2 speed;
+    // bool active;
+    // Color color;
+// } Shoot;
+
+// static Shoot* partnerBullets;
+///////////////////////////////////////
 // 其他共享結構和宣告 ...
 
 

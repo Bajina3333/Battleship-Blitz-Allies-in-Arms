@@ -1,25 +1,14 @@
+// In partner.h
 #ifndef PARTNER_H
 #define PARTNER_H
 
-#include "raylib.h"
-#include "type.h"
-// #include "raygui.h"
+#include "type.h"  // Ensure this includes Vector2 definition and any needed types
 
-// 夥伴結構定義
-// typedef struct Partner {
-    // Rectangle rec;
-    // int health;
-    // int attackPower;
-    // float attackRate;
-    // bool active;
-    // float attackTimer;
-// } Partner;
-
-// 夥伴相關函數宣告
 void InitPartner(Partner *partner, Vector2 playerPosition, PartnerType type);
 void UpdatePartner(Partner *partner, Vector2 playerPosition);
+void PartnerShoot(void);
+bool CheckPartnerCollisionRecs(Partner *partner, Enemy *enemy, float currentTime);
 void DrawPartner(Partner *partner);
-bool CheckPartnerCollisionRecs(Partner *partner, Enemy *enemy);
-PartnerType SelectPartnerType();
+void DrawPartnerHealth(const Partner *partner);
 
-#endif
+#endif // PARTNER_H
