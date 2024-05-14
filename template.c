@@ -12,7 +12,6 @@
 ********************************************************************************************/
 
 #include "raylib.h"
-#include "partner.h"
 
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
@@ -35,27 +34,27 @@
 // 定義一個 Enemy 結構，用來存儲敵人的位置、速度、是否激活和顏色。
 // 定義一個 Shoot 結構，用來存儲射擊的位置、速度、是否激活和顏色。
 //----------------------------------------------------------------------------------
-// typedef enum { FIRST = 0, SECOND, THIRD } EnemyWave;
+typedef enum { FIRST = 0, SECOND, THIRD } EnemyWave;
 
-// typedef struct Player{
-    // Rectangle rec;
-    // Vector2 speed;
-    // Color color;
-// } Player;
+typedef struct Player{
+    Rectangle rec;
+    Vector2 speed;
+    Color color;
+} Player;
 
-// typedef struct Enemy{
-    // Rectangle rec;
-    // Vector2 speed;
-    // bool active;
-    // Color color;
-// } Enemy;
+typedef struct Enemy{
+    Rectangle rec;
+    Vector2 speed;
+    bool active;
+    Color color;
+} Enemy;
 
-// typedef struct Shoot{
-    // Rectangle rec;
-    // Vector2 speed;
-    // bool active;
-    // Color color;
-// } Shoot;
+typedef struct Shoot{
+    Rectangle rec;
+    Vector2 speed;
+    bool active;
+    Color color;
+} Shoot;
 
 //------------------------------------------------------------------------------------
 // Global Variables Declaration
@@ -66,20 +65,18 @@
 // 定義射擊頻率和用於特效的 alpha 值。
 // 定義當前活躍的敵人數、已殺敵人數和動畫平滑過渡的標記。
 //------------------------------------------------------------------------------------
+// 在 test1.c 中声明全局变量的正确方式
 static const int screenWidth = 800;
 static const int screenHeight = 450;
-
 static bool gameOver = false;
-static bool pause =  false;
+static bool pause = false;
 static int score = 0;
 static bool victory = false;
 
-static Player player = { 0 };
-static Enemy enemy[NUM_MAX_ENEMIES] = { 0 };
-static Shoot shoot[NUM_SHOOTS] = { 0 };
-static EnemyWave wave = { 0 };
-
-static Partner partner = {0};
+static Player player = {0};
+static Enemy enemy[NUM_MAX_ENEMIES] = {0};  // 注意，全局数组的初始化要正确
+static Shoot shoot[NUM_SHOOTS] = {0};
+static EnemyWave wave = FIRST;
 
 static int shootRate = 0;
 static float alpha = 0.0f;
@@ -87,6 +84,14 @@ static float alpha = 0.0f;
 static int activeEnemies = 0;
 static int enemiesKill = 0;
 static bool smooth = false;
+
+// 函数原型
+void InitGame(void);
+void UpdateGame(void);
+void DrawGame(void);
+void UnloadGame(void);
+void UpdateDrawFrame(void);
+
 
 //------------------------------------------------------------------------------------
 // Module Functions Declaration (local)
@@ -172,8 +177,6 @@ void InitGame(void)
     player.speed.x = 5;
     player.speed.y = 5;
     player.color = BLACK;
-    
-    InitPartner(&partner, (Vector2){ player.rec.x, player.rec.y });
 
     // Initialize enemies
     // 通過迴圈初始化每個敵人的大小、隨機位置、速度、激活狀態和顏色。
@@ -292,14 +295,11 @@ void UpdateGame(void)
             if (IsKeyDown(KEY_LEFT)) player.rec.x -= player.speed.x;
             if (IsKeyDown(KEY_UP)) player.rec.y -= player.speed.y;
             if (IsKeyDown(KEY_DOWN)) player.rec.y += player.speed.y;
-            UpdatePartner(&partner, (Vector2){ player.rec.x, player.rec.y });
 
             // Player collision with enemy
             for (int i = 0; i < activeEnemies; i++)
             {
                 if (CheckCollisionRecs(player.rec, enemy[i].rec)) gameOver = true;
-                if (CheckCollisionRecs(partner.rec, enemy[i].rec)) gameOver = true;
-                // gameOver = CheckPartnerCollisionRecs(&partner, &enemy[i]);
             }
 
              // Enemy behaviour
@@ -397,7 +397,6 @@ void DrawGame(void)
         if (!gameOver)
         {
             DrawRectangleRec(player.rec, player.color);
-            DrawPartner(&partner);
 
             if (wave == FIRST) DrawText("FIRST WAVE", screenWidth/2 - MeasureText("FIRST WAVE", 40)/2, screenHeight/2 - 40, 40, Fade(BLACK, alpha));
             else if (wave == SECOND) DrawText("SECOND WAVE", screenWidth/2 - MeasureText("SECOND WAVE", 40)/2, screenHeight/2 - 40, 40, Fade(BLACK, alpha));
