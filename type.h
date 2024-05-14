@@ -14,13 +14,26 @@ typedef struct Player {
     Color color;
 } Player;
 
-// 敵人結構
-typedef struct Enemy {
+// 敵人結構(Boss)
+typedef struct Boss{
+    Rectangle rec;
+    bool active;
+    Color color;
+    int HP;
+    int Atk;
+    float frequency;
+}Boss;
+
+//敵人結構
+typedef struct Enemy{
     Rectangle rec;
     Vector2 speed;
     bool active;
     int attackPower;
     Color color;
+    int HP;
+    int Atk;
+    float frequency;
 } Enemy;
 
 // 射擊結構
