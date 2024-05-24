@@ -197,7 +197,7 @@ void InitGame(void)
         // 隨機選擇敵人類型
         int randType = GetRandomValue(0, 1);
         if (randType == 0) {
-            enemy[i].type = STANDARD; //enemy似乎沒有type成員
+            enemy[i].type = STANDARD;
             enemy[i].speed.x = 5;
             enemy[i].speed.y = 5;
             enemy[i].HP = 100;
@@ -205,7 +205,7 @@ void InitGame(void)
             enemy[i].color = GRAY;
         } 
         else if (randType == 1) {
-            enemy[i].type = STRONG; //enemy似乎沒有type成員
+            enemy[i].type = STRONG;
             enemy[i].speed.x = 3;
             enemy[i].speed.y = 3;
             enemy[i].HP = 200;
