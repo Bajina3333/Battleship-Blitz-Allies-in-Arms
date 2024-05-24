@@ -6,6 +6,7 @@
 
 // 定義敵人波次的枚舉類型
 typedef enum { FIRST = 0, SECOND, THIRD } EnemyWave;
+typedef enum {STANDARD, STRONG}EnemyType;
 
 // 玩家結構
 // typedef struct Player {
@@ -42,6 +43,7 @@ typedef struct Enemy{
     int HP;
     // int Atk;
     // float frequency;
+    EnemyType type;
 } Enemy;
 
 // 射擊結構
