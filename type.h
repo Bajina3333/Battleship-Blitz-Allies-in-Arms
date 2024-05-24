@@ -43,6 +43,7 @@ typedef struct Enemy{
     int HP;
     // int Atk;
     // float frequency;
+    EnemyType type;
 } Enemy;
 
 // 射擊結構
@@ -95,6 +96,12 @@ typedef struct Partner {
     // bool active;
     // Color color;
 // } Shoot;
+
+typedef struct Star_choose{ //Use 1, 2, 3 represent how many stars are in level
+    int level_1;
+    int level_2;
+    int level_3;
+}Star_choose;
 
 // static Shoot* partnerBullets;
 ///////////////////////////////////////
