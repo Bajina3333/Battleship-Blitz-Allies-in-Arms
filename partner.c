@@ -79,7 +79,7 @@ void InitPartnerShoot(Partner *partner, Shoot *shoot, int NUM_SHOOTS) {
         // }
     // }
 // }
-void PartnerShoot(Partner *partner, Shoot *partnerBullets, float deltaTime, int numBullets, Enemy *enemies, int numEnemies, int *score, int *enemiesKill) {
+void PartnerShoot(Partner *partner, Shoot *partnerBullets, float deltaTime, int numBullets, Enemy *enemies, int numEnemies, int *score, int *enemiesKill, int *total_count_Enemies, int *totalEnemies) {
     partner->attackTimer += deltaTime;
 
     // 檢查是否達到射擊頻率
@@ -109,9 +109,15 @@ void PartnerShoot(Partner *partner, Shoot *partnerBullets, float deltaTime, int 
                     if (enemies[j].HP <= 0) {
                         enemies[j].active = false; // 敵人死亡
                         (*enemiesKill)++;
+                        (*total_count_Enemies)++;
                         *score += 100;
-                        enemies[j].rec.x = GetRandomValue(-100, -1); // 可選擇將敵人移出屏幕
-                        enemies[j].rec.y = GetRandomValue(-100, -1);
+                        enemies[j].rec.x = GetRandomValue(1500, 2500); // 可選擇將敵人移出屏幕
+                        enemies[j].rec.y = GetRandomValue(0, 900 - enemies[j].rec.height);
+
+                        if (total_count_Enemies < totalEnemies)
+                        {
+                            enemies[j].active = true;  // 重新激活敌人
+                        }
                     }
                 }
             }
@@ -132,13 +138,14 @@ void UpdatePartner(Partner *partner, Vector2 playerPosition) {
 }
 
 
-void CheckPartnerCollisionRecs(Partner *partner, Enemy *enemy, int *enemiesKill) {
+void CheckPartnerCollisionRecs(Partner *partner, Enemy *enemy, int *enemiesKill, int *total_count_Enemies) {
     if (CheckCollisionRecs(partner->rec, enemy->rec)) {
         partner->HP -= (enemy->AttackPower);
         enemy->active = false;
         enemy->rec.x = GetRandomValue(-100, -1);
         enemy->rec.y = GetRandomValue(-100, -1);
         (*enemiesKill)++;
+        (*total_count_Enemies)++;
         if (partner->HP <= 0) {
             partner->active = false;
         }

@@ -2,10 +2,10 @@
 
 
 int LevelStar(int enemiesKill, int total_enemies){
-    if((enemiesKill / total_enemies) >= (2/3)){
+    if((enemiesKill % total_enemies) >= 6){
         return 3;        
     }
-    else if((enemiesKill / total_enemies) >= (1/3) ){
+    else if((enemiesKill % total_enemies) >= 3 ){
         return 2;        
     }
     else{

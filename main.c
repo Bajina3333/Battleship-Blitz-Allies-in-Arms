@@ -13,9 +13,9 @@
 //----------------------------------------------------------------------------------
 #define NUM_SHOOTS 50
 #define NUM_MAX_ENEMIES 50
-#define EASY_WAVE 30
-#define MEDIUM_WAVE 50
-#define HARD_WAVE 70
+#define EASY_WAVE 50
+#define MEDIUM_WAVE 75
+#define HARD_WAVE 100
 #define FIRST_WAVE_1 12
 #define SECOND_WAVE_1 18
 #define THIRD_WAVE_1 36
@@ -89,6 +89,9 @@ int gold = 0; //Golds held by the player
 int final_score = 0; //The score at the end of the game
 int add_score = 0; //Convert drops and equipments to scores
 bool store_enter = false; //Judge whether or not to execute the program of store with true or false
+int displayenemiesKill = 0;
+int displaytotalEnemies = 0;
+int displaygold = 0;
 
 static float stopTimer = 0.0f;
 static bool stopForScore = false;
@@ -155,10 +158,15 @@ void InitGame(void)
     smooth = false;
     wave = FIRST;
     totalEnemies = EASY_WAVE;
+    total_count_Enemies = 0;
     activeEnemies = FIRST_WAVE_1;
+    difficulty = EASY;
     enemiesKill = 0;
     score = 0;
     alpha = 0;
+    displayenemiesKill = 0;
+    displaytotalEnemies = 0;
+    displaygold = 0;
 
     // Initialize player
     player.HP = 100;
@@ -197,7 +205,7 @@ void InitGame(void)
         // 隨機選擇敵人類型
         int randType = GetRandomValue(0, 1);
         if (randType == 0) {
-            enemy[i].type = STANDARD;
+            enemy[i].type = STANDARD; //enemy似乎沒有type成員
             enemy[i].speed.x = 5;
             enemy[i].speed.y = 5;
             enemy[i].HP = 100;
@@ -205,7 +213,7 @@ void InitGame(void)
             enemy[i].color = GRAY;
         } 
         else if (randType == 1) {
-            enemy[i].type = STRONG;
+            enemy[i].type = STRONG; //enemy似乎沒有type成員
             enemy[i].speed.x = 3;
             enemy[i].speed.y = 3;
             enemy[i].HP = 200;
@@ -289,7 +297,7 @@ void UpdateGame(void)
                         {
                             wave = FIRST;
                             activeEnemies = FIRST_WAVE_3;
-                            difficulty = MEDIUM;
+                            difficulty = HARD;
                         }
                     }
                     if(difficulty == HARD){
@@ -473,21 +481,26 @@ void UpdateGame(void)
 
                 // Partner movement
                 UpdatePartner(&partner, (Vector2){ player.rec.x, player.rec.y });
-                PartnerShoot(&partner, &partner_shoot, deltaTime, NUM_SHOOTS, &enemy, NUM_MAX_ENEMIES, &score, &enemiesKill);
+                PartnerShoot(&partner, &partner_shoot, deltaTime, NUM_SHOOTS, &enemy, NUM_MAX_ENEMIES, &score, &enemiesKill, &total_count_Enemies, &totalEnemies);
 
                 // Player collision with enemy
                 for (int i = 0; i < activeEnemies; i++)
                 {
-                    if (CheckCollisionRecs(player.rec, enemy[i].rec)) 
+                    if (CheckCollisionRecs(player.rec, enemy[i].rec))
                     {
                         player.HP -= enemy[i].AttackPower;
                         enemy[i].active = false;
-                        enemy[i].rec.x = GetRandomValue(-100, -1);
-                        enemy[i].rec.y = GetRandomValue(-100, -1);
+                        enemy[i].rec.x = GetRandomValue(screenWidth, screenWidth + 1000);
+                        enemy[i].rec.y = GetRandomValue(0, screenHeight - enemy[i].rec.height);
                         enemiesKill++;
                         total_count_Enemies++;
+
+                        if (total_count_Enemies < totalEnemies)
+                        {
+                            enemy[i].active = true;  // 重新激活敌人
+                        }
                     }
-                    CheckPartnerCollisionRecs(&partner, &enemy[i], &enemiesKill);
+                    CheckPartnerCollisionRecs(&partner, &enemy[i], &enemiesKill, &total_count_Enemies);
                 }
 
                 if(player.HP <= 0) gameOver = true;
@@ -552,7 +565,7 @@ void UpdateGame(void)
                                     if (enemy[j].HP <= 0)
                                     {
                                         enemy[j].active = false;
-                                        enemy[j].rec.x = GetRandomValue(screenWidth, screenWidth + 1000);  // 假设屏幕宽度为800，敌人从右边出现
+                                        enemy[j].rec.x = GetRandomValue(screenWidth, screenWidth + 1000);
                                         enemy[j].rec.y = GetRandomValue(0, screenHeight - enemy[j].rec.height);  // 保持在屏幕高度范围内
                                         enemiesKill++;
                                         score += 100;
@@ -581,6 +594,9 @@ void UpdateGame(void)
                     displayScoreTime = true;
                     scoreAlpha = 0.0f;
 
+                    displaytotalEnemies = totalEnemies;
+                    displayenemiesKill = enemiesKill;
+
                     // Award gold based on performance
                     if(difficulty == EASY){
                         if (wave == FIRST) 
@@ -592,6 +608,7 @@ void UpdateGame(void)
                             else if(star_choose.level_1 == 2) gold += 200;
                             else if(star_choose.level_1 == 1) gold += 100;
                             gold += 200;
+                            
                         } 
                         else if (wave == SECOND) 
                         {
@@ -732,7 +749,17 @@ void DrawGame(void)
         // Draw score time message
         if (displayScoreTime) 
         {
-            DrawText("SCORE TIME", screenWidth/2 - MeasureText("SCORE TIME", 40)/2, screenHeight/2 - 40, 40, Fade(BLACK, scoreAlpha));
+            DrawText("SCORE TIME", screenWidth/2 - MeasureText("SCORE TIME", 40)/2, screenHeight/3 + 100 , 40, Fade(BLUE, scoreAlpha));
+            DrawText("(star_picture)", screenWidth/2 - MeasureText("(star_picture)", 40)/2, screenHeight/2 , 40, Fade(BLACK, scoreAlpha));
+
+            // 格式化 "Enemies Killed" 字符串
+            const char *enemiesKilledText = TextFormat("Enemies Killed: %04i / %04i", displayenemiesKill, displaytotalEnemies);
+            // 计算格式化字符串的宽度
+            int enemiesKilledTextWidth = MeasureText(enemiesKilledText, 40);
+            // 绘制 "Enemies Killed" 文本
+            DrawText(enemiesKilledText, screenWidth/2 - enemiesKilledTextWidth/2,  2*screenHeight/3 -100, 40, Fade(BLACK, scoreAlpha));
+
+            //const char *goldText = TextFormat("", displayenemiesKill, displaytotalEnemies);
         }
 
         for (int i = 0; i < activeEnemies; i++)
