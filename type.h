@@ -23,26 +23,24 @@ typedef struct Player{
 } Player;
 
 // 敵人結構(Boss)
-typedef struct Boss{
+/*typedef struct Boss{
     Rectangle rec;
     bool active;
     Color color;
     int HP;
     int Atk;
     float frequency;
-}Boss;
+}Boss;*/
 
 //敵人結構
 typedef struct Enemy{
     Rectangle rec;
     Vector2 speed;
     bool active;
-    // int attackPower;
     int AttackPower;
     Color color;
     int HP;
-    // int Atk;
-    // float frequency;
+    float frequency;
     EnemyType type;
 } Enemy;
 
