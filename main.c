@@ -12,7 +12,7 @@
 #define NUM_SHOOTS 50
 #define NUM_MAX_ENEMIES 50
 #define FIRST_WAVE_1 12
-#define SECOND_WAVE_1 18
+#define SECOND_WAVE_1 20
 #define THIRD_WAVE_1 36
 #define FIRST_WAVE_2 18
 #define SECOND_WAVE_2 30
@@ -20,6 +20,7 @@
 #define FIRST_WAVE_3 24
 #define SECOND_WAVE_3 36
 #define THIRD_WAVE_3 48
+#define BOSS_1 1
 //----------------------------------------------------------------------------------
 // Types and Structures Definition
 //----------------------------------------------------------------------------------
@@ -52,7 +53,7 @@
 //------------------------------------------------------------------------------------
 // Global Variables Declaration
 
-typedef enum {EASY, MEDIUM, HARD} Difficulty;
+//typedef enum {EASY, MEDIUM, HARD, BOSSLEVEL} Difficulty;
 static const int screenWidth = 1500;
 static const int screenHeight = 900;
 
@@ -167,21 +168,23 @@ void InitGame(void)
         // 隨機選擇敵人類型
         int randType = GetRandomValue(0, 1);
         if (randType == 0) {
-            enemy[i].type = STANDARD;
-            enemy[i].speed.x = 5;
-            enemy[i].speed.y = 5;
-            enemy[i].HP = 100;
-            enemy[i].AttackPower = 10;
-            enemy[i].color = GRAY;
+             enemy[i].type = STANDARD;
+             enemy[i].speed.x = 2;
+             enemy[i].speed.y = 2;
+             enemy[i].HP = 12;
+             enemy[i].AttackPower = 6;
+             enemy[i].color = GRAY;
+             enemy[i].frequency = 0.1;
         } 
          else if (randType == 1) {
             enemy[i].type = STRONG;
-            enemy[i].speed.x = 3;
-            enemy[i].speed.y = 3;
-            enemy[i].HP = 200;
-            enemy[i].AttackPower = 20;
+            enemy[i].speed.x = 2.5;
+            enemy[i].speed.y = 2.5;
+            enemy[i].HP = 45;
+            enemy[i].AttackPower = 5;
             enemy[i].color = GREEN;
-            }
+            enemy[i].frequency = 0.1;
+          }
     }
 
     // Initialize shoots
@@ -226,13 +229,13 @@ void UpdateGame(void)
                     if (enemiesKill == activeEnemies)
                     {
                         enemiesKill = 0;
-
+                        activeEnemies = SECOND_WAVE_1;
                         for (int i = 0; i < activeEnemies; i++)
                         {
-                            if (!enemy[i].active) enemy[i].active = true;
+                           enemy[i].active = true;
                         }
 
-                        activeEnemies = SECOND_WAVE_1;
+
                         wave = SECOND;
                         smooth = false;
                         alpha = 0.0f;
@@ -242,6 +245,29 @@ void UpdateGame(void)
                 {
                     if (!smooth)
                     {
+                       for(int i = 0; i < activeEnemies;i++){
+                            int randType = GetRandomValue(0, 1);
+                             if (randType == 0) {
+                                enemy[i].type = STANDARD;
+                                enemy[i].speed.x = 2;
+                                enemy[i].speed.y = 2;
+                                enemy[i].HP = 24;
+                                enemy[i].AttackPower = 12;
+                                enemy[i].color = GRAY;
+                                enemy[i].frequency = 0.1;
+                                }        
+                              else if (randType == 1) {
+                                enemy[i].type = STRONG;
+                                enemy[i].speed.x = 2.5;
+                                enemy[i].speed.y = 2.5;
+                                enemy[i].HP = 20;
+                                enemy[i].AttackPower = 20;
+                                enemy[i].color = GREEN;
+                                enemy[i].frequency = 0.1;
+                                }
+                        }
+                        enemiesKill = 0;
+                        activeEnemies = SECOND_WAVE_1;
                         alpha += 0.02f;
 
                         if (alpha >= 1.0f) smooth = true;
@@ -268,6 +294,28 @@ void UpdateGame(void)
                 {
                     if (!smooth)
                     {
+                        for(int i = 0; i < activeEnemies;i++){
+                            int randType = GetRandomValue(0, 1);
+                              if (randType == 0) {
+                                enemy[i].type = STANDARD;
+                                enemy[i].speed.x = 2;
+                                enemy[i].speed.y = 2;
+                                enemy[i].HP = 36;
+                                enemy[i].AttackPower = 18;
+                                enemy[i].color = GRAY;
+                                enemy[i].frequency = 0.1;
+                             } 
+                             else if (randType == 1) {
+                                enemy[i].type = STRONG;
+                                enemy[i].speed.x = 2.5;
+                                enemy[i].speed.y = 2.5;
+                                enemy[i].HP = 45;
+                                enemy[i].AttackPower = 20;
+                                enemy[i].color = GREEN;
+                                enemy[i].frequency = 0.1;
+                            }
+                            
+                        }
                         alpha += 0.02f;
 
                         if (alpha >= 1.0f) smooth = true;
@@ -302,6 +350,28 @@ void UpdateGame(void)
                 {
                     if (!smooth)
                     {
+                        for(int i = 0; i < activeEnemies;i++){
+                            int randType = GetRandomValue(0, 1);
+                             if (randType == 0) {
+                                enemy[i].type = STANDARD;
+                                enemy[i].speed.x = 2.5;
+                                enemy[i].speed.y = 2.5;
+                                enemy[i].HP = 24;
+                                enemy[i].AttackPower = 15;
+                                enemy[i].color = GRAY;
+                                enemy[i].frequency = 0.15;
+                             } 
+                             else if (randType == 1) {
+                                enemy[i].type = STRONG;
+                                enemy[i].speed.x = 2.7;
+                                enemy[i].speed.y = 2.7;
+                                enemy[i].HP = 60;
+                                enemy[i].AttackPower = 10;
+                                enemy[i].color = GREEN;
+                                enemy[i].frequency = 0.15;
+                            }
+                            
+                        }
                         alpha += 0.02f;
 
                         if (alpha >= 1.0f) smooth = true;
@@ -328,6 +398,28 @@ void UpdateGame(void)
                 {
                     if (!smooth)
                     {
+                        for(int i = 0; i < activeEnemies;i++){
+                            int randType = GetRandomValue(0, 1);
+                            if (randType == 0) {
+                                enemy[i].type = STANDARD;
+                                enemy[i].speed.x = 2.5;
+                                enemy[i].speed.y = 2.5;
+                                enemy[i].HP = 48;
+                                enemy[i].AttackPower = 30;
+                                enemy[i].color = GRAY;
+                                enemy[i].frequency = 0.15;
+                             } 
+                             else if (randType == 1) {
+                                enemy[i].type = STRONG;
+                                enemy[i].speed.x = 2.5;
+                                enemy[i].speed.y = 2.5;
+                                enemy[i].HP = 30;
+                                enemy[i].AttackPower = 30;
+                                enemy[i].color = GREEN;
+                                enemy[i].frequency = 0.15;
+                            }
+                            
+                        }
                         alpha += 0.02f;
 
                         if (alpha >= 1.0f) smooth = true;
@@ -354,6 +446,28 @@ void UpdateGame(void)
                 {
                     if (!smooth)
                     {
+                        for(int i = 0; i < activeEnemies;i++){
+                            int randType = GetRandomValue(0, 1);                            
+                             if (randType == 0) {
+                                enemy[i].type = STANDARD;
+                                enemy[i].speed.x = 2.5;
+                                enemy[i].speed.y = 2.5;
+                                enemy[i].HP = 72;
+                                enemy[i].AttackPower = 45;
+                                enemy[i].color = GRAY;
+                                enemy[i].frequency = 0.15;
+                             } 
+                             else if (randType == 1) {
+                                enemy[i].type = STRONG;
+                                enemy[i].speed.x = 2.7;
+                                enemy[i].speed.y = 2.7;
+                                enemy[i].HP = 60;
+                                enemy[i].AttackPower = 30;
+                                enemy[i].color = GREEN;
+                                enemy[i].frequency = 0.15;
+                            }
+                            
+                        }
                         alpha += 0.02f;
 
                         if (alpha >= 1.0f) smooth = true;
@@ -387,6 +501,28 @@ void UpdateGame(void)
                 {
                     if (!smooth)
                     {
+                        for(int i = 0; i < activeEnemies;i++){
+                            int randType = GetRandomValue(0, 1);
+                            if (randType == 0) {
+                                enemy[i].type = STANDARD;
+                                enemy[i].speed.x = 2.7;
+                                enemy[i].speed.y = 2.7;
+                                enemy[i].HP = 36;
+                                enemy[i].AttackPower = 18; //取大概整數
+                                enemy[i].color = GRAY;
+                                enemy[i].frequency = 0.2;
+                             } 
+                             else if (randType == 1) {
+                                enemy[i].type = STRONG;
+                                enemy[i].speed.x = 3;
+                                enemy[i].speed.y = 3;
+                                enemy[i].HP = 75;
+                                enemy[i].AttackPower = 5;
+                                enemy[i].color = GREEN;
+                                enemy[i].frequency = 0.2;
+                            }
+                            
+                        }
                         alpha += 0.02f;
 
                         if (alpha >= 1.0f) smooth = true;
@@ -413,6 +549,28 @@ void UpdateGame(void)
                 {
                     if (!smooth)
                     {
+                        for(int i = 0; i < activeEnemies;i++){
+                            int randType = GetRandomValue(0, 1);
+                            if (randType == 0) {
+                                enemy[i].type = STANDARD;
+                                enemy[i].speed.x = 2.7;
+                                enemy[i].speed.y = 2.7;
+                                enemy[i].HP = 20;//調換了standard and strong atk and hp value
+                                enemy[i].AttackPower = 40;
+                                enemy[i].color = GRAY;
+                                enemy[i].frequency = 0.2;
+                             } 
+                             else if (randType == 1) {
+                                enemy[i].type = STRONG;
+                                enemy[i].speed.x = 3;
+                                enemy[i].speed.y = 3;
+                                enemy[i].HP = 72;
+                                enemy[i].AttackPower = 45;
+                                enemy[i].color = GREEN;
+                                enemy[i].frequency = 0.2;
+                            }
+                            
+                        }
                         alpha += 0.02f;
 
                         if (alpha >= 1.0f) smooth = true;
@@ -437,7 +595,7 @@ void UpdateGame(void)
                 } break;
                 case THIRD:
                 {
-                    if (!smooth)
+                    /*if (!smooth)
                     {
                         alpha += 0.02f;
 
@@ -446,12 +604,80 @@ void UpdateGame(void)
 
                     if (smooth) alpha -= 0.02f;
 
-                    if (enemiesKill == activeEnemies) victory = true;
+                    if (enemiesKill == activeEnemies) victory = true;*/
+                    if (!smooth)
+                    {
+                        for(int i = 0; i < activeEnemies;i++){
+                            int randType = GetRandomValue(0, 1);
+                            if (randType == 0) {
+                                enemy[i].type = STANDARD;
+                                enemy[i].speed.x = 2.7;
+                                enemy[i].speed.y = 2.7;
+                                enemy[i].HP = 75;
+                                enemy[i].AttackPower = 40;//switch HP and atk of strong and standard
+                                enemy[i].color = GRAY;
+                                enemy[i].frequency = 0.2;
+                             } 
+                             else if (randType == 1) {
+                                enemy[i].type = STRONG;
+                                enemy[i].speed.x = 3;
+                                enemy[i].speed.y = 3;
+                                enemy[i].HP = 108;
+                                enemy[i].AttackPower = 68;
+                                enemy[i].color = GREEN;
+                                enemy[i].frequency = 0.2;
+                            }
+                        }
+                        alpha += 0.02f;
+
+                        if (alpha >= 1.0f) smooth = true;
+                    }
+
+                    if (smooth) alpha -= 0.02f;
+
+                    if (enemiesKill == activeEnemies)
+                    {
+                        enemiesKill = 0;
+
+                        for (int i = 0; i < activeEnemies; i++)
+                        {
+                            if (!enemy[i].active) enemy[i].active = true;
+                        }
+
+                        activeEnemies = BOSS_1;
+                        wave = BOSSWAVE;
+                        difficulty = BOSSLEVEL;
+                        smooth = false;
+                        alpha = 0.0f;
+                    }
 
                 } break;
                 default: break;
             }
         }
+        else if(difficulty==BOSSLEVEL){
+            if (!smooth)
+                    {
+                        for(int i = 0; i < activeEnemies;i++){
+                            enemy[i].rec.width = 300;
+                            enemy[i].rec.height = 700;
+                            enemy[i].speed.x = 1;
+                            enemy[i].speed.y = 1;
+                            enemy[i].HP = 1000;
+                            enemy[i].AttackPower = 100;
+                            enemy[i].type = BOSS;
+                        }
+                        alpha += 3.0f;
+
+                        if (alpha >= 1.0f) smooth = true;
+                    }
+
+                    if (smooth) alpha -= 0.02f;
+
+                    if (enemiesKill == activeEnemies) victory = true;
+        }
+        
+        
 
             // Player movement
             if (IsKeyDown(KEY_RIGHT)) player.rec.x += player.speed.x;
@@ -473,7 +699,7 @@ void UpdateGame(void)
             {
                 if (CheckCollisionRecs(player.rec, enemy[i].rec)) {
                     player.HP -= enemy[i].AttackPower;
-                    enemy[i].active = false;
+                    //enemy[i].active = false;
                     enemy[i].rec.x = GetRandomValue(-100, -1);
                     enemy[i].rec.y = GetRandomValue(-100, -1);
                     enemiesKill++;
@@ -481,7 +707,8 @@ void UpdateGame(void)
                 CheckPartnerCollisionRecs(&partner, &enemy[i], &enemiesKill);
             }
             if(player.HP <= 0)gameOver = true;
-            
+                
+            //enemiesKill=0;
              // Enemy behaviour
             for (int i = 0; i < activeEnemies; i++)
             {
@@ -491,12 +718,16 @@ void UpdateGame(void)
 
                     if (enemy[i].rec.x < 0)
                     {
-                        /*enemy[i].rec.x = GetRandomValue(screenWidth, screenWidth + 1000);
-                        enemy[i].rec.y = GetRandomValue(0, screenHeight - enemy[i].rec.height);*/
+                        enemy[i].rec.x = GetRandomValue(screenWidth, screenWidth + 1000);
+                        enemy[i].rec.y = GetRandomValue(0, screenHeight - enemy[i].rec.height);
+                     
                         enemy[i].active = false;  // Deactivate the enemy
-                        enemiesKill++;  // Increment the enemiesKill counter
-                    
+                        enemiesKill++;  // Increment the enemiesKill counter 
+                        
                     }
+                    
+                    
+                    
                 }
             }
 
@@ -590,15 +821,28 @@ void DrawGame(void)
             if (wave == FIRST) DrawText("FIRST WAVE", screenWidth/2 - MeasureText("FIRST WAVE", 40)/2, screenHeight/2 - 40, 40, Fade(BLACK, alpha));
             else if (wave == SECOND) DrawText("SECOND WAVE", screenWidth/2 - MeasureText("SECOND WAVE", 40)/2, screenHeight/2 - 40, 40, Fade(BLACK, alpha));
             else if (wave == THIRD) DrawText("THIRD WAVE", screenWidth/2 - MeasureText("THIRD WAVE", 40)/2, screenHeight/2 - 40, 40, Fade(BLACK, alpha));
+            else if (wave == BOSSWAVE) DrawText("BEAT THE BOSS TO WIN", screenWidth/2 - MeasureText("BEAT THE BOSS TO WIN", 40)/2, screenHeight/2 - 40, 40, Fade(BLACK, alpha));
             if (difficulty == EASY) DrawText("EASY", screenWidth/2 - MeasureText("EASY", 40)/2, screenHeight/2, 40, Fade(BLACK, alpha));
             else if (difficulty == MEDIUM) DrawText("MEDIUM", screenWidth/2 - MeasureText("MEDIUM", 40)/2, screenHeight/2, 40, Fade(BLACK, alpha));
             else if (difficulty == HARD) DrawText("HARD", screenWidth/2 - MeasureText("HARD", 40)/2, screenHeight/2, 40, Fade(BLACK, alpha));
-
+            else if (difficulty == BOSSLEVEL) DrawText("BOSSLEVEL", screenWidth/2 - MeasureText("BOSSLEVEL", 40)/2, screenHeight/2, 40, Fade(BLACK, alpha));
+            
+            DrawText(TextFormat("Enemies Killed:%03i", enemiesKill), 20, 140, 20, GRAY);
+            
+            DrawText(TextFormat("Active Enemies1:%03i", activeEnemies), 20, 180, 20, GRAY);
+            int temp = 0;
+            
             for (int i = 0; i < activeEnemies; i++)
             {
-                if (enemy[i].active) DrawRectangleRec(enemy[i].rec, enemy[i].color);
+                if (enemy[i].active){
+                    DrawRectangleRec(enemy[i].rec, enemy[i].color);                  
+                    temp++;
+                }//DrawText(TextFormat("Enemy %d: %s", i, enemy[i].active), enemy[i].rec.x, enemy[i].rec.y - 20, 10, BLACK);
             }
-
+               
+               DrawText(TextFormat("Active Enemies:%03i", temp), 20, 200, 20, GRAY);
+               
+               
             for (int i = 0; i < NUM_SHOOTS; i++)
             {
                 if (shoot[i].active) DrawRectangleRec(shoot[i].rec, shoot[i].color);
