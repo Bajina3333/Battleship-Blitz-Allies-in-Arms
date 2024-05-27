@@ -13,8 +13,8 @@
 //----------------------------------------------------------------------------------
 #define NUM_SHOOTS 50
 #define NUM_MAX_ENEMIES 50
-#define EASY_WAVE 50
-#define MEDIUM_WAVE 75
+#define EASY_WAVE 40
+#define MEDIUM_WAVE 70
 #define HARD_WAVE 100
 #define FIRST_WAVE_1 12
 #define SECOND_WAVE_1 18
@@ -115,6 +115,11 @@ int main(void)
     // Initialization (Note windowTitle is unused on Android)
     //---------------------------------------------------------
     InitWindow(screenWidth, screenHeight, "Battleship Blitz: Allies in Arms"); //change
+
+    //Texture2D FullStar = LoadTexture("C:\raylib\raylib\battle_picture\img\系統\FullStar.png"); //路徑取決位置
+    //Texture2D TwoStar = LoadTexture("C:\raylib\raylib\battle_picture\img\系統\TwoStar.png"); //路徑取決位置
+    //Texture2D OneStar = LoadTexture("C:\raylib\raylib\battle_picture\img\系統\OneStar.png"); //路徑取決位置
+   
 
     InitGame();
 
@@ -604,10 +609,10 @@ void UpdateGame(void)
                             smooth = false;
                             alpha = 0.0f;
                             star_choose.level_1 = LevelStar(enemiesKill, totalEnemies);
-                            if(star_choose.level_1 == 3) gold += 300; 
-                            else if(star_choose.level_1 == 2) gold += 200;
+                            if(star_choose.level_1 == 3) gold += 500; 
+                            else if(star_choose.level_1 == 2) gold += 300;
                             else if(star_choose.level_1 == 1) gold += 100;
-                            gold += 200;
+                            
                             
                         } 
                         else if (wave == SECOND) 
@@ -615,20 +620,20 @@ void UpdateGame(void)
                             smooth = false;
                             alpha = 0.0f;
                             star_choose.level_2 = LevelStar(enemiesKill, totalEnemies);
-                            if(star_choose.level_2 == 3) gold += 300; 
-                            else if(star_choose.level_2 == 2) gold += 200;
+                            if(star_choose.level_2 == 3) gold += 500; 
+                            else if(star_choose.level_2 == 2) gold += 300;
                             else if(star_choose.level_2 == 1) gold += 100;
-                            gold += 200;
+                            
                         } 
                         else if (wave == THIRD) 
                         {
                             smooth = false;
                             alpha = 0.0f;
                             star_choose.level_3 = LevelStar(enemiesKill, totalEnemies);
-                            if(star_choose.level_3 == 3) gold += 300; 
-                            else if(star_choose.level_3 == 2) gold += 200;
+                            if(star_choose.level_3 == 3) gold += 500; 
+                            else if(star_choose.level_3 == 2) gold += 300;
                             else if(star_choose.level_3 == 1) gold += 100;
-                            gold += 200;
+                            
                         }
                     }
                     if(difficulty == MEDIUM){
@@ -637,30 +642,30 @@ void UpdateGame(void)
                             smooth = false;
                             alpha = 0.0f;
                             star_choose.level_1 = LevelStar(enemiesKill, totalEnemies);
-                            if(star_choose.level_1 == 3) gold += 300; 
-                            else if(star_choose.level_1 == 2) gold += 200;
+                            if(star_choose.level_1 == 3) gold += 500; 
+                            else if(star_choose.level_1 == 2) gold += 300;
                             else if(star_choose.level_1 == 1) gold += 100;
-                            gold += 200;
+                            
                         } 
                         else if (wave == SECOND) 
                         {
                             smooth = false;
                             alpha = 0.0f;
                             star_choose.level_2 = LevelStar(enemiesKill, totalEnemies);
-                            if(star_choose.level_2 == 3) gold += 300; 
-                            else if(star_choose.level_2 == 2) gold += 200;
+                            if(star_choose.level_2 == 3) gold += 500; 
+                            else if(star_choose.level_2 == 2) gold += 300;
                             else if(star_choose.level_2 == 1) gold += 100;
-                            gold += 200;
+                            
                         } 
                         else if (wave == THIRD) 
                         {
                             smooth = false;
                             alpha = 0.0f;
                             star_choose.level_3 = LevelStar(enemiesKill, totalEnemies);
-                            if(star_choose.level_3 == 3) gold += 300; 
-                            else if(star_choose.level_3 == 2) gold += 200;
+                            if(star_choose.level_3 == 3) gold += 500; 
+                            else if(star_choose.level_3 == 2) gold += 300;
                             else if(star_choose.level_3 == 1) gold += 100;
-                            gold += 200;
+                            
                         }
                     }
                     if(difficulty == HARD){
@@ -669,30 +674,30 @@ void UpdateGame(void)
                             smooth = false;
                             alpha = 0.0f;
                             star_choose.level_1 = LevelStar(enemiesKill, totalEnemies);
-                            if(star_choose.level_1 == 3) gold += 300; 
-                            else if(star_choose.level_1 == 2) gold += 200;
+                            if(star_choose.level_1 == 3) gold += 500; 
+                            else if(star_choose.level_1 == 2) gold += 300;
                             else if(star_choose.level_1 == 1) gold += 100;
-                            gold += 200;
+                            
                         } 
                         else if (wave == SECOND) 
                         {
                             smooth = false;
                             alpha = 0.0f;
                             star_choose.level_2 = LevelStar(enemiesKill, totalEnemies);
-                            if(star_choose.level_2 == 3) gold += 300; 
-                            else if(star_choose.level_2 == 2) gold += 200;
+                            if(star_choose.level_2 == 3) gold += 500; 
+                            else if(star_choose.level_2 == 2) gold += 300;
                             else if(star_choose.level_2 == 1) gold += 100;
-                            gold += 200;
+                            
                         } 
                         else if (wave == THIRD) 
                         {
                             smooth = false;
                             alpha = 0.0f;
                             star_choose.level_3 = LevelStar(enemiesKill, totalEnemies);
-                            if(star_choose.level_3 == 3) gold += 300; 
-                            else if(star_choose.level_3 == 2) gold += 200;
+                            if(star_choose.level_3 == 3) gold += 500; 
+                            else if(star_choose.level_3 == 2) gold += 300;
                             else if(star_choose.level_3 == 1) gold += 100;
-                            gold += 200;
+                            
                         }
                     }
 
@@ -749,8 +754,8 @@ void DrawGame(void)
         // Draw score time message
         if (displayScoreTime) 
         {
-            DrawText("SCORE TIME", screenWidth/2 - MeasureText("SCORE TIME", 40)/2, screenHeight/3 + 100 , 40, Fade(BLUE, scoreAlpha));
-            DrawText("(star_picture)", screenWidth/2 - MeasureText("(star_picture)", 40)/2, screenHeight/2 , 40, Fade(BLACK, scoreAlpha));
+            DrawText("SCORE TIME", screenWidth/2 - MeasureText("SCORE TIME", 40)/2, screenHeight/3 +50 , 40, Fade(BLUE, scoreAlpha));
+            DrawText("(star_picture)", screenWidth/2 - MeasureText("(star_picture)", 40)/2, screenHeight/2 -50, 40, Fade(BLACK, scoreAlpha));
 
             // 格式化 "Enemies Killed" 字符串
             const char *enemiesKilledText = TextFormat("Enemies Killed: %04i / %04i", displayenemiesKill, displaytotalEnemies);
@@ -759,8 +764,42 @@ void DrawGame(void)
             // 绘制 "Enemies Killed" 文本
             DrawText(enemiesKilledText, screenWidth/2 - enemiesKilledTextWidth/2,  2*screenHeight/3 -100, 40, Fade(BLACK, scoreAlpha));
 
-            //const char *goldText = TextFormat("", displayenemiesKill, displaytotalEnemies);
+            if(wave == FIRST){
+                if(star_choose.level_1 == 3){
+                    //DrawTexture(FullStar, screenWidth/2 - FullStar.width/2, screenHeight/2 - FullStar.height/2, Fade(WHITE, scoreAlpha));
+                    DrawText("Gold+500", screenWidth/2 - MeasureText("Gold+500", 40)/2, screenHeight/2, 40, Fade(BLACK, scoreAlpha));
+                }
+                else if(star_choose.level_1 == 2){
+                    DrawText("Gold+300", screenWidth/2 - MeasureText("Gold+300", 40)/2, screenHeight/2, 40, Fade(BLACK, scoreAlpha));
+                }
+                else if(star_choose.level_1 == 1){
+                    DrawText("Gold+100", screenWidth/2 - MeasureText("Gold+100", 40)/2, screenHeight/2, 40, Fade(BLACK, scoreAlpha));
+                }
+            }
+            else if(wave == SECOND){
+                if(star_choose.level_2 == 3){
+                    DrawText("Gold+500", screenWidth/2 - MeasureText("Gold+500", 40)/2, screenHeight/2, 40, Fade(BLACK, scoreAlpha));
+                }
+                else if(star_choose.level_2 == 2){
+                    DrawText("Gold+300", screenWidth/2 - MeasureText("Gold+300", 40)/2, screenHeight/2, 40, Fade(BLACK, scoreAlpha));
+                }
+                else if(star_choose.level_2 == 1){
+                    DrawText("Gold+100", screenWidth/2 - MeasureText("Gold+100", 40)/2, screenHeight/2, 40, Fade(BLACK, scoreAlpha));
+                }
+            }
+            if(wave == THIRD){
+                if(star_choose.level_3 == 3){
+                    DrawText("Gold+500", screenWidth/2 - MeasureText("Gold+500", 40)/2, screenHeight/2, 40, Fade(BLACK, scoreAlpha));
+                }
+                else if(star_choose.level_3 == 2){
+                    DrawText("Gold+300", screenWidth/2 - MeasureText("Gold+300", 40)/2, screenHeight/2, 40, Fade(BLACK, scoreAlpha));
+                }
+                else if(star_choose.level_3 == 1){
+                    DrawText("Gold+100", screenWidth/2 - MeasureText("Gold+100", 40)/2, screenHeight/2, 40, Fade(BLACK, scoreAlpha));
+                }
+            }
         }
+    
 
         for (int i = 0; i < activeEnemies; i++)
         {
