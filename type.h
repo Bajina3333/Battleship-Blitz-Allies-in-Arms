@@ -4,12 +4,13 @@
 #include "raylib.h"
 #include "raygui.h" 
 
-
-// 定義敵人的枚舉類型
+// 定義敵人波次的枚舉類型
 typedef enum { FIRST = 0, SECOND, THIRD, BOSSWAVE} EnemyWave;
 typedef enum {STANDARD, STRONG, BOSS}EnemyType;
 typedef enum {EASY, MEDIUM, HARD, BOSSLEVEL} Difficulty;
 
+extern int standard_num;
+extern int Strong_num;
 
 // 玩家結構
 // typedef struct Player {
