@@ -68,7 +68,9 @@ static float alpha = 0.0f;
 static int activeEnemies = 0;
 static int enemiesKill = 0;
 static bool smooth = false;
-
+static float effectStartTime = 0;
+static bool showEffect = false;
+static char effectType = '\0';
 //------------------------------------------------------------------------------------
 // Module Functions Declaration (local)
 //------------------------------------------------------------------------------------
@@ -145,8 +147,9 @@ void InitGame(void)
     player.color = RED;
 
     // Initialize partner
-    int chosenType = 0;
-    InitPartner(&partner, (Vector2){player.rec.x, player.rec.y}, chosenType);
+    int chosenType = 2; // PARTNER_TYPE_ONE、PARTNER_TYPE_TWO、PARTNER_TYPE_THREE
+    // InitPartner(&partner, (Vector2){player.rec.x, player.rec.y}, chosenType);
+    buyPartner(chosenType, &partner, (Vector2){player.rec.x, player.rec.y});
 
 
     // Initialize enemies
@@ -183,6 +186,7 @@ void InitGame(void)
 // Update game (one frame)
 void UpdateGame(void)
 {
+
     float deltaTime = GetFrameTime(); // 獲取上一幀的時間，用於平滑動畫和計算
     if (!gameOver)
     {
@@ -262,19 +266,38 @@ void UpdateGame(void)
             }
 
             // Player movement
-            if (IsKeyDown(KEY_RIGHT)) player.rec.x += player.speed.x;
-            if (IsKeyDown(KEY_LEFT)) player.rec.x -= player.speed.x;
-            if (IsKeyDown(KEY_UP)) player.rec.y -= player.speed.y;
+            if (IsKeyDown(KEY_RIGHT))  player.rec.x += player.speed.x;
+            
+            if (IsKeyDown(KEY_LEFT))  player.rec.x -= player.speed.x;
+            
+            if (IsKeyDown(KEY_UP))  player.rec.y -= player.speed.y;
+            
             if (IsKeyDown(KEY_DOWN)) player.rec.y += player.speed.y;
-
+            
             // Partner movement
-            UpdatePartner(&partner, (Vector2){ player.rec.x, player.rec.y });
-             // 更新射擊
-            // PartnerShoot(&partner, &partner_shoot, deltaTime, NUM_SHOOTS); 
+            UpdatePartner(&partner, (Vector2){ player.rec.x, player.rec.y }, &player);
+
+            // Update effect display status
+            float currentTime = GetTime();
+            if (partner.effectActive) {
+                if ((currentTime - partner.lastEffectTime) < 1) {
+                    showEffect = true;
+                    effectType = partner.effectType;
+                    effectStartTime = currentTime;
+                } else {
+                    if ((effectType == 'H' && (currentTime - effectStartTime) >= 3) || 
+                        (effectType == 'A' && (currentTime - effectStartTime) >= 7) || 
+                        (effectType == 'S' && (currentTime - effectStartTime) >= 10)) {
+                        showEffect = false;
+                    }
+                }
+            }
+
+
+            ///////////////////////////
             PartnerShoot(&partner, &partner_shoot, deltaTime, NUM_SHOOTS, &enemy, NUM_MAX_ENEMIES, &score, &enemiesKill);
 
             // Get Time to avoid 
-            // float currentTime = GetTime();
 
             // Player collision with enemy
             for (int i = 0; i < activeEnemies; i++)
@@ -391,6 +414,20 @@ void DrawGame(void)
             
             // draw partner
             DrawPartner(&partner);
+            
+            float currentTime = GetTime();
+            if (showEffect) {
+                int fontSize = player.rec.width; // 字體大小設置為玩家寬度
+                if (effectType == 'H' && (currentTime - effectStartTime) < 3) {
+                    DrawText("+", player.rec.x + player.rec.width, player.rec.y - player.rec.height / 2, fontSize, GREEN);
+                } else if (effectType == 'A' && (currentTime - effectStartTime) < 7) {
+                    DrawText("↑", player.rec.x + player.rec.width, player.rec.y - player.rec.height / 2, fontSize, ORANGE);
+                } else if (effectType == 'S' && (currentTime - effectStartTime) < 10) {
+                    DrawText("↑", player.rec.x + player.rec.width, player.rec.y - player.rec.height / 2, fontSize, BLUE); // 使用藍色箭頭表示速度增加
+                } else {
+                    showEffect = false;
+                }
+            }
 
             if (wave == FIRST) DrawText("FIRST WAVE", screenWidth/2 - MeasureText("FIRST WAVE", 40)/2, screenHeight/2 - 40, 40, Fade(BLACK, alpha));
             else if (wave == SECOND) DrawText("SECOND WAVE", screenWidth/2 - MeasureText("SECOND WAVE", 40)/2, screenHeight/2 - 40, 40, Fade(BLACK, alpha));

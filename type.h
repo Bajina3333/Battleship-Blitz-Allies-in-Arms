@@ -80,6 +80,11 @@ typedef struct Partner {
     // float lastHitTime;  // 上次被攻击的时间
     float shootTimer;  // 跟踪下一次射擊的計時器
     float lastShootTime;  // 上一次射擊的時間
+    float lastEffectTime;
+    float effect_interval;
+    float effect_duration;
+    bool effectActive;
+    char effectType;
     PartnerType type;  // 添加一个类型字段
 } Partner;
 
