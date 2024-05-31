@@ -62,47 +62,21 @@ void InitPartnerShoot(Partner *partner, Shoot *shoot, int NUM_SHOOTS) {
     }
 }
 
-// void PartnerShoot(Partner *partner, Shoot *partnerBullets, float deltaTime, int numBullets) {
-    // 增加伙伴的攻擊計時器
-    // partner->attackTimer += deltaTime;
-
-    // 檢查是否達到射擊頻率
-    // if (partner->attackTimer >= 0.2f) {
-        // partner->attackTimer = 0; // 重置計時器
-        // for (int i = 0; i < numBullets; i++) {
-            // if (!partnerBullets[i].active) {
-                // partnerBullets[i].rec.x = partner->rec.x + partner->rec.width; // 從伙伴前面發射
-                // partnerBullets[i].rec.y = partner->rec.y + partner->rec.height / 2;
-                // partnerBullets[i].speed.x = 200; // 根據需要設置合適的速度
-                // partnerBullets[i].active = true;
-                // break;
-            // }
-        // }
-    // }
-
-    // 更新所有活動的子彈
-    // for (int i = 0; i < numBullets; i++) {
-        // if (partnerBullets[i].active) {
-            // partnerBullets[i].rec.x += partnerBullets[i].speed.x * deltaTime; // 更新位置
-            // if (partnerBullets[i].rec.x > GetScreenWidth()) {  // 使用 GetScreenWidth() 函數
-                // partnerBullets[i].active = false;
-            // }
-        // }
-    // }
-// }
 void PartnerShoot(Partner *partner, Shoot *partnerBullets, float deltaTime, int numBullets, Enemy *enemies, int numEnemies, int *score, int *enemiesKill) {
-    partner->attackTimer += deltaTime;
+    if (partner->active) {
+        partner->attackTimer += deltaTime;
 
-    // 檢查是否達到射擊頻率
-    if (partner->attackTimer >= 0.3f) {
-        partner->attackTimer = 0; // 重置計時器
-        for (int i = 0; i < numBullets; i++) {
-            if (!partnerBullets[i].active) {
-                partnerBullets[i].rec.x = partner->rec.x + partner->rec.width; // 從伙伴前面發射
-                partnerBullets[i].rec.y = partner->rec.y + partner->rec.height / 2;
-                partnerBullets[i].speed.x = 200; // 根據需要設置合適的速度
-                partnerBullets[i].active = true;
-                break;
+        // 檢查是否達到射擊頻率
+        if (partner->attackTimer >= 0.3f) {
+            partner->attackTimer = 0; // 重置計時器
+            for (int i = 0; i < numBullets; i++) {
+                if (!partnerBullets[i].active) {
+                    partnerBullets[i].rec.x = partner->rec.x + partner->rec.width; // 從伙伴前面發射
+                    partnerBullets[i].rec.y = partner->rec.y + partner->rec.height / 2;
+                    partnerBullets[i].speed.x = 200; // 根據需要設置合適的速度
+                    partnerBullets[i].active = true;
+                    break;
+                }
             }
         }
     }
@@ -131,7 +105,7 @@ void PartnerShoot(Partner *partner, Shoot *partnerBullets, float deltaTime, int 
                 partnerBullets[i].active = false;
             }
         }
-    } 
+    }
 }
 
 // void UpdatePartner(Partner *partner, Vector2 playerPosition) {
