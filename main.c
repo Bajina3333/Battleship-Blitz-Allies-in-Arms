@@ -270,10 +270,6 @@ void InitGame(void)
     background_hell.height = 900;
 
 
-    // Initialize partner
-    int chosenType = 0;
-    InitPartner(&partner, (Vector2){player.rec.x, player.rec.y}, chosenType);
-
 
     // Initialize enemies
     for (int i = 0; i < NUM_MAX_ENEMIES; i++)
@@ -646,11 +642,6 @@ void UpdateGame(void)
             ///////////////////////////
             PartnerShoot(&partner, &partner_shoot, deltaTime, NUM_SHOOTS, &enemy, NUM_MAX_ENEMIES, &score, &enemiesKill);
 
-            // Get Time to avoid 
-
-                // Partner movement
-                UpdatePartner(&partner, (Vector2){ player.rec.x, player.rec.y });
-                PartnerShoot(&partner, &partner_shoot, deltaTime, NUM_SHOOTS, &enemy, NUM_MAX_ENEMIES, &score, &enemiesKill, &total_count_Enemies, &totalEnemies);
 
                 // Player collision with enemy
                 for (int i = 0; i < activeEnemies; i++)
@@ -669,7 +660,7 @@ void UpdateGame(void)
                             enemy[i].active = true;  // 重新激活敌人
                         }
                     }
-                    CheckPartnerCollisionRecs(&partner, &enemy[i], &enemiesKill, &total_count_Enemies);
+                    CheckPartnerCollisionRecs(&partner, &enemy[i], &enemiesKill);
                 }
 
                 if(player.HP <= 0) gameOver = true;

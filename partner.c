@@ -6,7 +6,7 @@ void buyPartner(int chosenType, Partner *partner, Vector2 playerPosition) {
     InitPartner(partner, playerPosition, chosenType);    
 }
 
-void InitPartner(Partner *partner, Vector2 playerPosition, PartnerType type) {
+// void InitPartner(Partner *partner, Vector2 playerPosition, PartnerType type) {
 void InitPartner(Partner *partner, Vector2 playerPosition, PartnerType type) {
     partner->rec.width = 20;
     partner->rec.height = 20;
