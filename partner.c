@@ -7,10 +7,13 @@ void buyPartner(int chosenType, Partner *partner, Vector2 playerPosition) {
 }
 
 void InitPartner(Partner *partner, Vector2 playerPosition, PartnerType type) {
+void InitPartner(Partner *partner, Vector2 playerPosition, PartnerType type) {
     partner->rec.width = 20;
     partner->rec.height = 20;
     partner->rec.x = playerPosition.x - 30;  // 初始位置在玩家旁边
+    partner->rec.x = playerPosition.x - 30;  // 初始位置在玩家旁边
     partner->rec.y = playerPosition.y + 20;
+    partner->type = type;  // 设置类型
     partner->type = type;  // 设置类型
     partner->active = true;
     partner->attackTimer = 0.0f; // ?
