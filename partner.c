@@ -161,6 +161,6 @@ void DrawPartner(Partner *partner) {
 
 void DrawPartnerHealth(const Partner *partner) {
     if (partner->active) {
-       DrawText(TextFormat("HP:%03i", partner->HP), 20, 100, 20, GRAY);
+       DrawText(TextFormat("HP:%03i", partner->HP), 20, 100, 20, RED);
     }
 }
