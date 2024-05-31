@@ -216,11 +216,11 @@ void InitGame(void)
     gameOver = false;
     victory = false;
     smooth = false;
-    wave = THIRD;
+    wave = FIRST;
     totalEnemies = EASY_WAVE;
     total_count_Enemies = 0;
     activeEnemies = FIRST_WAVE_1;
-    difficulty = HARD;
+    difficulty = EASY;
     enemiesKill = 0;
     score = 0;
     alpha = 0;
