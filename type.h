@@ -15,6 +15,8 @@ extern int Strong_num;
 typedef struct Player{
     int HP;
     int AttackPower;
+    int MaxHP;
+    
     Rectangle rec;
     Vector2 speed;
     Color color;
@@ -64,8 +66,15 @@ typedef struct Partner {
     float attackRate;
     bool active;
     float attackTimer;
+    // float hitCooldown;  // 用于受击冷却
+    // float lastHitTime;  // 上次被攻击的时间
     float shootTimer;  // 跟踪下一次射擊的計時器
     float lastShootTime;  // 上一次射擊的時間
+    float lastEffectTime;
+    float effect_interval;
+    float effect_duration;
+    bool effectActive;
+    char effectType;
     PartnerType type;  // 添加一个类型字段
 } Partner;
 

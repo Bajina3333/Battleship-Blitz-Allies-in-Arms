@@ -4,9 +4,7 @@
 #include "raylib.h"
 #include "type.h"
 
-void Choose_Item(Player *player);
-// void Event(Player *player, gold);
-// int Drops_Time();
-// void Drops_Type(Player *player);
+int Choose_Item(Player *player);
+int Event(Player *player, int *gold, Shoot *shoot, int *ShootControl , Partner *partner ,int *cureHP, char *text);
 
 #endif
