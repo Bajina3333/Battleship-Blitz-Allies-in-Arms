@@ -300,8 +300,6 @@ void InitGame(void)
             enemy[i].color = GRAY;
             enemy[i].frequency = 0.3;
         }
-        enemy[i].HP = 100;
-        enemy[i].AttackPower= 10;
     }
 
     // Initialize shoots

@@ -141,7 +141,7 @@ void UpdatePartner(Partner *partner, Vector2 playerPosition, Player *player) {
             partner->effectType = 'S';
         }
 
-        if ((currentTime - partner->lastEffectTime) > partner->effect_duration) {
+        if (partner->effectActive && (currentTime - partner->lastEffectTime) >  partner->effect_duration) {
             player->speed.x = origin_player_speed_x; // 恢復原始速度
             player->speed.y = origin_player_speed_y; // 恢復原始速度
             partner->effectActive = false;
@@ -174,7 +174,7 @@ void UpdatePartner(Partner *partner, Vector2 playerPosition, Player *player) {
             partner->effectType = 'A';
         }
 
-        if ((currentTime - partner->lastEffectTime) > partner->effect_duration) {
+        if (partner->effectActive && (currentTime - partner->lastEffectTime) > partner->effect_duration) {
             player->AttackPower = origin_player_attack; // 恢復原始攻擊力
             partner->effectActive = false;
             partner->effectType = '\0';
