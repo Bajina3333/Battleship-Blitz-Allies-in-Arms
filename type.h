@@ -11,34 +11,35 @@ typedef enum {EASY, MEDIUM, HARD, BOSSLEVEL} Difficulty;
 
 extern int standard_num;
 extern int Strong_num;
-// 玩家結構
-typedef struct Player {
+
+typedef struct Player{
     int HP;
     int AttackPower;
+    int MaxHP;
+    
     Rectangle rec;
     Vector2 speed;
     Color color  
 } Player;
 
 // 敵人結構(Boss)
-typedef struct Boss{
+/*typedef struct Boss{
     Rectangle rec;
     bool active;
     Color color;
     int HP;
     int Atk;
     float frequency;
-}Boss;
+}Boss;*/
 
 //敵人結構
 typedef struct Enemy{
     Rectangle rec;
     Vector2 speed;
     bool active;
+    int AttackPower;
     Color color;
     int HP;
-    int AttackPower;
-    // int Atk;
     float frequency;
     EnemyType type;
 } Enemy;

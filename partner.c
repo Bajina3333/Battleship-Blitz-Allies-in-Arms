@@ -171,7 +171,7 @@ void UpdatePartner(Partner *partner, Vector2 playerPosition, Player *player) {
             partner->effectType = '\0';
             partner->CD = (rand() % 5) + 20;
         }
-    }
+    }*/
 }
 
 

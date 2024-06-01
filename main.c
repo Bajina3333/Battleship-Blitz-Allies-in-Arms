@@ -2,6 +2,7 @@
 #include "type.h"
 #include "partner.h"
 #include "game_system.h"
+#include "item.h"
 #include <stdbool.h>
 
 #if defined(PLATFORM_WEB)
@@ -35,7 +36,6 @@ static const int screenHeight = 900;
 
 static bool gameOver = false;
 static bool pause =  false;
-static int score = 0; //enemies percentage is converted into scores
 static bool victory = false;
 
 static Player player = { 0 };
@@ -48,6 +48,12 @@ static Shoot partner_shoot[NUM_SHOOTS] = { 0 };
 static EnemyWave wave = { 0 };
 static Star_choose star_choose = {0};
 static Difficulty difficulty = EASY;
+static int ShootControl = 0;
+static int cureHP = 0;
+static float timeCounter = 0.0f;
+static int itemchoose = 0;
+static int eventchoose = 0;
+static char text[100] = "";
 
 static int shootRate = 0;
 static float alpha = 0.0f; //alpha的值範圍是 0.0 到 1.0，其中 0.0 表示完全透明，1.0 表示完全不透明，用來逐步增加或減少文字的透明度，實現文字淡入淡出的效果
@@ -55,13 +61,11 @@ static float alpha = 0.0f; //alpha的值範圍是 0.0 到 1.0，其中 0.0 表�
 
 static int totalEnemies = 0;//The number of enemies should be killed in the level
 static int activeEnemies = 0; //The number of enemies at that level
-static int total_count_Enemies = 0; //The number of enemies actuall appeared in the level
+static int total_count_Enemies = 0; //The number of enemies actually appeared in the level
 static int enemiesKill = 0; //The number of enemies in the level
 static bool smooth = false;
 
 int gold = 0; //Golds held by the player
-int final_score = 0; //The score at the end of the game
-int add_score = 0; //Convert drops and equipments to scores
 bool store_enter = false; //Judge whether or not to execute the program of store with true or false
 int displayenemiesKill = 0;
 int displaytotalEnemies = 0;
@@ -71,6 +75,7 @@ static float stopTimer = 0.0f;
 static bool stopForScore = false;
 static float scoreAlpha = 0.0f;
 static bool displayScoreTime = false;
+static bool displayitem = false;
 
 static Texture2D background_ocean = { 0 };
 static Texture2D background_city = { 0 };
@@ -111,9 +116,7 @@ static Texture2D FullStar = { 0 };
 static Texture2D TwoStar = { 0 };
 static Texture2D OneStar = { 0 };
 
-static float effectStartTime = 0;
-static bool showEffect = false;
-static char effectType = '\0';
+
 //------------------------------------------------------------------------------------
 // Module Functions Declaration (local) 
 //------------------------------------------------------------------------------------
@@ -151,20 +154,20 @@ int main(void)
     armor = LoadTexture("img/equipment/armor.png");
     artillery = LoadTexture("img/equipment/artillery.png");
     cure = LoadTexture("img/equipment/cure.png");
-    energy_beam = LoadTexture("img/equipment/energy beam.png");
-    machine_gun = LoadTexture("img/equipment/machine gun.png");
+    energy_beam = LoadTexture("img/equipment/energy_beam.png");
+    machine_gun = LoadTexture("img/equipment/machine_gun.png");
     missile = LoadTexture("img/equipment/missile.png");
-    plasma_cannon = LoadTexture("img/equipment/plasma cannon.png");
+    plasma_cannon = LoadTexture("img/equipment/plasma_cannon.png");
     thruster = LoadTexture("img/equipment/thruster.png");
     upgrade = LoadTexture("img/equipment/upgrade.png");
 
     drumstick = LoadTexture("img/item/drumstick.png");
-    first_aid_kit = LoadTexture("img/item/first aid kit.png");
-    fix_tool = LoadTexture("img/item/fix tool.png");
-    invincible_stars = LoadTexture("img/item/invincible stars.png");
-    iron_shield = LoadTexture("img/item/iron shield.png");
-    radio_jammer = LoadTexture("img/item/radio jammer.png");
-    shock_wave = LoadTexture("img/item/shock wave.png");
+    first_aid_kit = LoadTexture("img/item/first_aid_kit.png");
+    fix_tool = LoadTexture("img/item/fix_tool.png");
+    invincible_stars = LoadTexture("img/item/invincible_stars.png");
+    iron_shield = LoadTexture("img/item/iro_shield.png");
+    radio_jammer = LoadTexture("img/item/radio_jammer.png");
+    shock_wave = LoadTexture("img/item/shock_wave.png");
  
     partner_1 = LoadTexture("img/partner/attack.png");
     partner_2 = LoadTexture("img/partner/recover.png");
@@ -224,14 +227,21 @@ void InitGame(void)
     activeEnemies = FIRST_WAVE_1;
     difficulty = EASY;
     enemiesKill = 0;
-    score = 0;
     alpha = 0;
     displayenemiesKill = 0;
     displaytotalEnemies = 0;
+    displayitem = false;
     displaygold = 0;
+    ShootControl = -1;
+    cureHP =0;
+    timeCounter = 0.0f;
+    itemchoose = 0;
+    eventchoose = 0;
+    *text = "";
 
     // Initialize player
     player.HP = 100;
+    player.MaxHP = 100;
     player.AttackPower = 20;
     player.rec.x =  10;
     player.rec.y = screenHeight / 2;
@@ -357,60 +367,77 @@ void UpdateGame(void)
                     
                     if(difficulty == EASY){
                         if (wave == FIRST) 
-                        {
+                        {   
+                            ShootControl--;
+                            if(ShootControl<0)ShootControl = -1;
                             activeEnemies = SECOND_WAVE_1;
                             wave = SECOND;
 
                         } 
                         else if (wave == SECOND) 
                         {
+                            ShootControl--;
                             activeEnemies = THIRD_WAVE_1;
                             wave = THIRD;
                             
                         } 
                         else if (wave == THIRD) 
                         {
+                            displayitem = false;
+                            
+                            ShootControl--;
                             activeEnemies = FIRST_WAVE_2;
                             difficulty = MEDIUM;
                             wave = FIRST;
-                            
+         
                         }
+                        
                     }
                     if(difficulty == MEDIUM){
                         if (wave == FIRST) 
                         {
+                            ShootControl--;
                             wave = SECOND;
                             activeEnemies = SECOND_WAVE_2;
                         } 
                         else if (wave == SECOND) 
                         {
+                            ShootControl--;
                             wave = THIRD;
                             activeEnemies = THIRD_WAVE_2;
                         } 
                         else if (wave == THIRD) 
                         {
+                            
+                            displayitem = false;
+                            ShootControl--;
                             wave = FIRST;
                             activeEnemies = FIRST_WAVE_3;
                             difficulty = HARD;
                         }
+                        
                     }
                     if(difficulty == HARD){
                         if (wave == FIRST) 
                         {
+                            ShootControl--;
                             wave = SECOND;
                             activeEnemies = SECOND_WAVE_3;
                         } 
                         else if (wave == SECOND) 
                         {
+                            ShootControl--;
                             wave = THIRD;
                             activeEnemies = THIRD_WAVE_3;
                         } 
                         else if (wave == THIRD) {
+                            ShootControl--;
                             wave = BOSSWAVE;
                             activeEnemies = BOSS_1;
                             difficulty = BOSSLEVEL;
 
                         }
+                       
                     }
 
                     // Reset enemy active state
@@ -461,7 +488,146 @@ void UpdateGame(void)
                                 if (alpha >= 1.0f) smooth = true;
                             }
 
-                    if (smooth) alpha -= 0.02f;
+                            if (smooth) alpha -= 0.02f;
+                            
+                            if(alpha == 0.00f){
+                                for(int i = 0; i < activeEnemies;i++){
+                                    enemy[i].active = true;
+                                    if (i < 20) {
+                                        enemy[i].type = STANDARD;
+                                        enemy[i].speed.x = 2;
+                                        enemy[i].speed.y = 2;
+                                        enemy[i].HP = 24;
+                                        enemy[i].AttackPower = 12;
+                                        enemy[i].color = GRAY;
+                                        enemy[i].frequency = 0.1;
+                                    }        
+                                    else {
+                                        enemy[i].type = STRONG;
+                                        enemy[i].speed.x = 2.5;
+                                        enemy[i].speed.y = 2.5;
+                                        enemy[i].HP = 20;
+                                        enemy[i].AttackPower = 20;
+                                        enemy[i].color = GREEN;
+                                        enemy[i].frequency = 0.1;
+                                    }
+                                }
+                            }
+
+                        } break;
+                        case THIRD:
+                        {
+                            totalEnemies = EASY_WAVE;
+                            if (!smooth)
+                            {
+                                for(int i = 0; i < activeEnemies;i++){
+                                    enemy[i].active = true;
+                                    if (i < 20) {
+                                        enemy[i].type = STANDARD;
+                                        enemy[i].speed.x = 2;
+                                        enemy[i].speed.y = 2;
+                                        enemy[i].HP = 36;
+                                        enemy[i].AttackPower = 18;
+                                        enemy[i].color = GRAY;
+                                        enemy[i].frequency = 0.1;
+                                    }        
+                                    else {
+                                        enemy[i].type = STRONG;
+                                        enemy[i].speed.x = 2.5;
+                                        enemy[i].speed.y = 2.5;
+                                        enemy[i].HP = 45;
+                                        enemy[i].AttackPower = 20;
+                                        enemy[i].color = GREEN;
+                                        enemy[i].frequency = 0.1;
+                                        }
+                                }
+
+                                alpha += 0.02f;
+
+                                if (alpha >= 1.0f) smooth = true;
+                            }
+                            
+                            if (smooth) alpha -= 0.02f;
+
+
+                        } break;
+                        
+                        default: break;
+                    }
+                }
+                if(difficulty == MEDIUM){
+                    switch (wave)
+                    {
+                        case FIRST:
+                        {
+                            totalEnemies = MEDIUM_WAVE;
+                            if (!smooth)
+                            {
+                                for(int i = 0; i < activeEnemies;i++){
+                                    enemy[i].active = true;
+                                    if (i < 15) {
+                                        enemy[i].type = STANDARD;
+                                        enemy[i].speed.x = 2.5;
+                                        enemy[i].speed.y = 2.5;
+                                        enemy[i].HP = 24;
+                                        enemy[i].AttackPower = 15;
+                                        enemy[i].color = GRAY;
+                                        enemy[i].frequency = 0.15;
+                                    } 
+                                    else{
+                                        enemy[i].type = STRONG;
+                                        enemy[i].speed.x = 2.7;
+                                        enemy[i].speed.y = 2.7;
+                                        enemy[i].HP = 60;
+                                        enemy[i].AttackPower = 10;
+                                        enemy[i].color = GREEN;
+                                        enemy[i].frequency = 0.15;
+                                    }
+                                    
+                                }
+
+                                alpha += 0.02f;
+
+                                if (alpha >= 1.0f) smooth = true;
+                            }
+
+                            if (smooth) alpha -= 0.02f;
+
+                        } break;
+                        case SECOND:
+                        {
+                            totalEnemies = MEDIUM_WAVE;
+                            if (!smooth)
+                            {
+                                for(int i = 0; i < activeEnemies;i++){
+                                    enemy[i].active = true;
+                                    if (i < 25) {
+                                        enemy[i].type = STANDARD;
+                                        enemy[i].speed.x = 2.5;
+                                        enemy[i].speed.y = 2.5;
+                                        enemy[i].HP = 48;
+                                        enemy[i].AttackPower = 30;
+                                        enemy[i].color = GRAY;
+                                        enemy[i].frequency = 0.15;
+                                    } 
+                                    else{
+                                        enemy[i].type = STRONG;
+                                        enemy[i].speed.x = 2.5;
+                                        enemy[i].speed.y = 2.5;
+                                        enemy[i].HP = 30;
+                                        enemy[i].AttackPower = 30;
+                                        enemy[i].color = GREEN;
+                                        enemy[i].frequency = 0.15;
+                                    }
+                                    
+                                }
+
+                                alpha += 0.02f;
+
+                                if (alpha >= 1.0f) smooth = true;
+                            }
+
+                            if (smooth) alpha -= 0.02f;
 
                         } break;
                         case THIRD:
@@ -499,14 +665,17 @@ void UpdateGame(void)
                             if (smooth) alpha -= 0.02f;
 
                         } break;
+                        
                         default: break;
                     }
+                    
                 }
                 if(difficulty == HARD){
                     switch (wave)
                     {
                         case FIRST:
                         {
+                            
                             totalEnemies = HARD_WAVE;
                             if (!smooth)
                             {
@@ -577,6 +746,42 @@ void UpdateGame(void)
                             if (smooth) alpha -= 0.02f;
 
                         } break;
+                        case THIRD:
+                        {
+                            totalEnemies = HARD_WAVE;
+                            if (!smooth)
+                            {
+                                for(int i = 0; i < activeEnemies;i++){
+                                    enemy[i].active = true;
+                                    if (i < 40) {
+                                        enemy[i].type = STANDARD;
+                                        enemy[i].speed.x = 2.7;
+                                        enemy[i].speed.y = 2.7;
+                                        enemy[i].HP = 75;
+                                        enemy[i].AttackPower = 40;//switch HP and atk of strong and standard
+                                        enemy[i].color = GRAY;
+                                        enemy[i].frequency = 0.2;
+                                    } 
+                                    else {
+                                        enemy[i].type = STRONG;
+                                        enemy[i].speed.x = 3;
+                                        enemy[i].speed.y = 3;
+                                        enemy[i].HP = 108;
+                                        enemy[i].AttackPower = 68;
+                                        enemy[i].color = GREEN;
+                                        enemy[i].frequency = 0.2;
+                                    }
+                                }
+
+                                alpha += 0.02f;
+
+                                if (alpha >= 1.0f) smooth = true;
+                            }
+
+                            if (smooth) alpha -= 0.02f;
+
+                        } break;
+
                         default: break;
                     }
                 }
@@ -609,37 +814,25 @@ void UpdateGame(void)
             
 
                 // Player movement
-                if (IsKeyDown(KEY_RIGHT))  player.rec.x += player.speed.x;
-            
-                if (IsKeyDown(KEY_LEFT))  player.rec.x -= player.speed.x;
-            
-                if (IsKeyDown(KEY_UP))  player.rec.y -= player.speed.y;
-            
+                if (IsKeyDown(KEY_RIGHT)) player.rec.x += player.speed.x;
+                if (IsKeyDown(KEY_LEFT)) player.rec.x -= player.speed.x;
+                if (IsKeyDown(KEY_UP)) player.rec.y -= player.speed.y;
                 if (IsKeyDown(KEY_DOWN)) player.rec.y += player.speed.y;
-            
-            // Partner movement
-            UpdatePartner(&partner, (Vector2){ player.rec.x, player.rec.y }, &player);
-
-            // Update effect display status
-            float currentTime = GetTime();
-            if (partner.effectActive) {
-                if ((currentTime - partner.lastEffectTime) < 1) {
-                    showEffect = true;
-                    effectType = partner.effectType;
-                    effectStartTime = currentTime;
-                } else {
-                    if ((effectType == 'H' && (currentTime - effectStartTime) >= 3) || 
-                        (effectType == 'A' && (currentTime - effectStartTime) >= 7) || 
-                        (effectType == 'S' && (currentTime - effectStartTime) >= 10)) {
-                        showEffect = false;
+                
+                timeCounter += deltaTime;
+                if(cureHP>0){
+                    if(player.HP<player.MaxHP){
+                        if (timeCounter >= 1.0f)
+                            {
+                                player.HP += cureHP;
+                                timeCounter = 0.0f; // 重置计时器
+                            }
                     }
                 }
-            }
-
-
-            ///////////////////////////
-            PartnerShoot(&partner, &partner_shoot, deltaTime, NUM_SHOOTS, &enemy, NUM_MAX_ENEMIES, &score, &enemiesKill);
-
+                
+                // Partner movement
+                UpdatePartner(&partner, (Vector2){ player.rec.x, player.rec.y },&player);
+                PartnerShoot(&partner, &partner_shoot, deltaTime, NUM_SHOOTS, &enemy, NUM_MAX_ENEMIES, &enemiesKill, &total_count_Enemies, &totalEnemies);
 
                 // Player collision with enemy
                 for (int i = 0; i < activeEnemies; i++)
@@ -658,7 +851,7 @@ void UpdateGame(void)
                             enemy[i].active = true;  // 重新激活敌人
                         }
                     }
-                    CheckPartnerCollisionRecs(&partner, &enemy[i], &enemiesKill);
+                    CheckPartnerCollisionRecs(&partner, &enemy[i], &enemiesKill, &total_count_Enemies, &partner_shoot[i]);
                 }
 
                 if(player.HP <= 0) gameOver = true;
@@ -748,7 +941,7 @@ void UpdateGame(void)
                 if (player.rec.y + player.rec.height >= screenHeight) player.rec.y = screenHeight - player.rec.height;
 
                 // Shoot initialization
-                if (IsKeyDown(KEY_SPACE) )
+                if (IsKeyDown(KEY_SPACE) && ShootControl<0)
                 {
                     shootRate += 5;
 
@@ -788,7 +981,6 @@ void UpdateGame(void)
                                         enemy[j].rec.x = GetRandomValue(screenWidth, screenWidth + 1000);
                                         enemy[j].rec.y = GetRandomValue(0, screenHeight - enemy[j].rec.height);  // 保持在屏幕高度范围内
                                         enemiesKill++;
-                                        score += 100;
                                         total_count_Enemies++;
                                         
                                         // 重新激活敌人，直到总敌人数达到 totalEnemies
@@ -829,7 +1021,8 @@ void UpdateGame(void)
                             if(star_choose.level_1 == 3) gold += 500; 
                             else if(star_choose.level_1 == 2) gold += 300;
                             else if(star_choose.level_1 == 1) gold += 100;
-                           
+                            eventchoose = Event(&player,&gold,&shoot, &ShootControl , &partner, &cureHP, text);
+                            
                         } 
                         else if (wave == SECOND) 
                         {
@@ -840,7 +1033,7 @@ void UpdateGame(void)
                             if(star_choose.level_2 == 3) gold += 500; 
                             else if(star_choose.level_2 == 2) gold += 300;
                             else if(star_choose.level_2 == 1) gold += 100;
-                            
+                            eventchoose = Event(&player,&gold,&shoot, &ShootControl , &partner, &cureHP, text);
                         } 
                         else if (wave == THIRD) 
                         {
@@ -851,8 +1044,10 @@ void UpdateGame(void)
                             if(star_choose.level_3 == 3) gold += 500; 
                             else if(star_choose.level_3 == 2) gold += 300;
                             else if(star_choose.level_3 == 1) gold += 100;
-                            
-                        }
+                            displayitem = true;
+                            itemchoose = Choose_Item(&player); 
+                            eventchoose = Event(&player,&gold,&shoot, &ShootControl , &partner, &cureHP,  text);
+                         }
                     }
                     if(difficulty == MEDIUM){
                         if (wave == FIRST) 
@@ -864,7 +1059,7 @@ void UpdateGame(void)
                             if(star_choose.level_1 == 3) gold += 500; 
                             else if(star_choose.level_1 == 2) gold += 300;
                             else if(star_choose.level_1 == 1) gold += 100;
-                            
+                            eventchoose = Event(&player,&gold,&shoot, &ShootControl , &partner, &cureHP,  text);
                         } 
                         else if (wave == SECOND) 
                         {
@@ -875,7 +1070,7 @@ void UpdateGame(void)
                             if(star_choose.level_2 == 3) gold += 500; 
                             else if(star_choose.level_2 == 2) gold += 300;
                             else if(star_choose.level_2 == 1) gold += 100;
-                            
+                            eventchoose = Event(&player,&gold,&shoot, &ShootControl , &partner, &cureHP,  text);
                         } 
                         else if (wave == THIRD) 
                         {
@@ -886,7 +1081,9 @@ void UpdateGame(void)
                             if(star_choose.level_3 == 3) gold += 500; 
                             else if(star_choose.level_3 == 2) gold += 300;
                             else if(star_choose.level_3 == 1) gold += 100;
-                            
+                            eventchoose = Event(&player,&gold,&shoot, &ShootControl , &partner, &cureHP,  text);
+                            displayitem = true;
+                            itemchoose = Choose_Item(&player);
                         }
                     }
                     if(difficulty == HARD){
@@ -899,7 +1096,7 @@ void UpdateGame(void)
                             if(star_choose.level_1 == 3) gold += 500; 
                             else if(star_choose.level_1 == 2) gold += 300;
                             else if(star_choose.level_1 == 1) gold += 100;
-                            
+                            eventchoose = Event(&player,&gold,&shoot, &ShootControl , &partner, &cureHP,  text);
                         } 
                         else if (wave == SECOND) 
                         {
@@ -910,7 +1107,7 @@ void UpdateGame(void)
                             if(star_choose.level_2 == 3) gold += 500; 
                             else if(star_choose.level_2 == 2) gold += 300;
                             else if(star_choose.level_2 == 1) gold += 100;
-                            
+                            eventchoose = Event(&player,&gold,&shoot, &ShootControl , &partner, &cureHP,  text);
                         } 
                         else if (wave == THIRD) 
                         {
@@ -921,7 +1118,9 @@ void UpdateGame(void)
                             if(star_choose.level_3 == 3) gold += 500; 
                             else if(star_choose.level_3 == 2) gold += 300;
                             else if(star_choose.level_3 == 1) gold += 100;
-                            
+                            displayitem = true;
+                            itemchoose = Choose_Item(&player); 
+                            eventchoose = Event(&player,&gold,&shoot, &ShootControl , &partner, &cureHP,  text);
                         }
                     }
                     else if(difficulty == BOSSLEVEL){
@@ -931,7 +1130,6 @@ void UpdateGame(void)
                         enemy[0].active = false;
                         victory = true;
                     }
-
 
                     enemiesKill = 0;
                     total_count_Enemies = 0;
@@ -963,7 +1161,6 @@ void DrawGame(void)
     BeginDrawing();
 
     ClearBackground(RAYWHITE);
-        DrawPartnerHealth(&partner);
 
     if (!gameOver)
     {
@@ -977,23 +1174,6 @@ void DrawGame(void)
         DrawPartnerHealth(&partner);
 
         DrawRectangleRec(player.rec, player.color);
-            
-            // draw partner
-            DrawPartner(&partner);
-            
-            float currentTime = GetTime();
-            if (showEffect) {
-                int fontSize = player.rec.width; // 字體大小設置為玩家寬度
-                if (effectType == 'H' && (currentTime - effectStartTime) < 3) {
-                    DrawText("+", player.rec.x + player.rec.width, player.rec.y - player.rec.height / 2, fontSize, GREEN);
-                } else if (effectType == 'A' && (currentTime - effectStartTime) < 7) {
-                    DrawText("↑", player.rec.x + player.rec.width, player.rec.y - player.rec.height / 2, fontSize, ORANGE);
-                } else if (effectType == 'S' && (currentTime - effectStartTime) < 10) {
-                    DrawText("↑", player.rec.x + player.rec.width, player.rec.y - player.rec.height / 2, fontSize, BLUE); // 使用藍色箭頭表示速度增加
-                } else {
-                    showEffect = false;
-                }
-            }
         // Draw partner
         DrawPartner(&partner);
 
@@ -1009,60 +1189,70 @@ void DrawGame(void)
         
         
         // Draw score time message
-        if (displayScoreTime) 
+        if (displayScoreTime  && difficulty != BOSSLEVEL) 
         {
-            DrawText("SCORE TIME", screenWidth/2 - MeasureText("SCORE TIME", 40)/2, screenHeight/3 +50 , 40, Fade(BLUE, scoreAlpha));
-
+            DrawText("SCORE TIME", screenWidth/2 - MeasureText("SCORE TIME", 40)/2, screenHeight/3 -60 , 40, Fade(BLUE, scoreAlpha));  
+            
             // 格式化 "Enemies Killed" 字符串
             const char *enemiesKilledText = TextFormat("Enemies Killed: %04i / %04i", displayenemiesKill, displaytotalEnemies);
             // 计算格式化字符串的宽度
             int enemiesKilledTextWidth = MeasureText(enemiesKilledText, 40);
             // 绘制 "Enemies Killed" 文本
-            DrawText(enemiesKilledText, screenWidth/2 - enemiesKilledTextWidth/2,  2*screenHeight/3 -90, 40, Fade(BLACK, scoreAlpha));
+            DrawText(enemiesKilledText, screenWidth/2 - enemiesKilledTextWidth/2,  2*screenHeight/3 -190, 40, Fade(BLACK, scoreAlpha));
 
             if(wave == FIRST){
                 if(star_choose.level_1 == 3){
-                    DrawTexture(FullStar, screenWidth/2 - FullStar.width/2, screenHeight/2 - FullStar.height/2 - 30, Fade(WHITE, scoreAlpha));
-                    DrawText("Gold+500", screenWidth/2 - MeasureText("Gold+500", 40)/2, screenHeight/2 +10, 40, Fade(BLACK, scoreAlpha));
+                    DrawTexture(FullStar, screenWidth/2 - FullStar.width/2, screenHeight/2 - FullStar.height/2 - 130, Fade(WHITE, scoreAlpha));
+                    DrawText("Gold+500", screenWidth/2 - MeasureText("Gold+500", 40)/2, screenHeight/2 -90, 40, Fade(BLACK, scoreAlpha));
                 }
                 else if(star_choose.level_1 == 2){
-                    DrawTexture(TwoStar, screenWidth/2 - TwoStar.width/2, screenHeight/2 - TwoStar.height/2 - 30, Fade(WHITE, scoreAlpha));
-                    DrawText("Gold+300", screenWidth/2 - MeasureText("Gold+300", 40)/2, screenHeight/2 +10, 40, Fade(BLACK, scoreAlpha));
+                    DrawTexture(TwoStar, screenWidth/2 - TwoStar.width/2, screenHeight/2 - TwoStar.height/2 - 130, Fade(WHITE, scoreAlpha));
+                    DrawText("Gold+300", screenWidth/2 - MeasureText("Gold+300", 40)/2, screenHeight/2 -90, 40, Fade(BLACK, scoreAlpha));
                 }
                 else if(star_choose.level_1 == 1){
-                    DrawTexture(OneStar, screenWidth/2 - OneStar.width/2, screenHeight/2 - OneStar.height/2 - 30, Fade(WHITE, scoreAlpha));
-                    DrawText("Gold+100", screenWidth/2 - MeasureText("Gold+100", 40)/2, screenHeight/2 +10, 40, Fade(BLACK, scoreAlpha));
+                    DrawTexture(OneStar, screenWidth/2 - OneStar.width/2, screenHeight/2 - OneStar.height/2 - 130, Fade(WHITE, scoreAlpha));
+                    DrawText("Gold+100", screenWidth/2 - MeasureText("Gold+100", 40)/2, screenHeight/2 -90, 40, Fade(BLACK, scoreAlpha));
                 }
             }
             else if(wave == SECOND){
                 if(star_choose.level_2 == 3){
-                    DrawTexture(FullStar, screenWidth/2 - FullStar.width/2, screenHeight/2 - FullStar.height/2 - 30, Fade(WHITE, scoreAlpha));
-                    DrawText("Gold+500", screenWidth/2 - MeasureText("Gold+500", 40)/2, screenHeight/2 +10, 40, Fade(BLACK, scoreAlpha));
+                    DrawTexture(FullStar, screenWidth/2 - FullStar.width/2, screenHeight/2 - FullStar.height/2 - 130, Fade(WHITE, scoreAlpha));
+                    DrawText("Gold+500", screenWidth/2 - MeasureText("Gold+500", 40)/2, screenHeight/2 -90, 40, Fade(BLACK, scoreAlpha));
                 }
                 else if(star_choose.level_2 == 2){
-                    DrawTexture(TwoStar, screenWidth/2 - TwoStar.width/2, screenHeight/2 - TwoStar.height/2 - 30, Fade(WHITE, scoreAlpha));
-                    DrawText("Gold+300", screenWidth/2 - MeasureText("Gold+300", 40)/2, screenHeight/2 +10, 40, Fade(BLACK, scoreAlpha));
+                    DrawTexture(TwoStar, screenWidth/2 - TwoStar.width/2, screenHeight/2 - TwoStar.height/2 - 130, Fade(WHITE, scoreAlpha));
+                    DrawText("Gold+300", screenWidth/2 - MeasureText("Gold+300", 40)/2, screenHeight/2 -90, 40, Fade(BLACK, scoreAlpha));
                 }
                 else if(star_choose.level_2 == 1){
-                    DrawTexture(OneStar, screenWidth/2 - OneStar.width/2, screenHeight/2 - OneStar.height/2 - 30, Fade(WHITE, scoreAlpha));
-                    DrawText("Gold+100", screenWidth/2 - MeasureText("Gold+100", 40)/2, screenHeight/2 +10, 40, Fade(BLACK, scoreAlpha));
+                    DrawTexture(OneStar, screenWidth/2 - OneStar.width/2, screenHeight/2 - OneStar.height/2 - 130, Fade(WHITE, scoreAlpha));
+                    DrawText("Gold+100", screenWidth/2 - MeasureText("Gold+100", 40)/2, screenHeight/2 -90, 40, Fade(BLACK, scoreAlpha));
                 }
             }
-            if(wave == THIRD){
+            else if(wave == THIRD){
                 if(star_choose.level_3 == 3){
-                    DrawTexture(FullStar, screenWidth/2 - FullStar.width/2, screenHeight/2 - FullStar.height/2 - 30, Fade(WHITE, scoreAlpha));
-                    DrawText("Gold+500", screenWidth/2 - MeasureText("Gold+500", 40)/2, screenHeight/2 +10, 40, Fade(BLACK, scoreAlpha));
+                    DrawTexture(FullStar, screenWidth/2 - FullStar.width/2, screenHeight/2 - FullStar.height/2 - 130, Fade(WHITE, scoreAlpha));
+                    DrawText("Gold+500", screenWidth/2 - MeasureText("Gold+500", 40)/2, screenHeight/2 -90, 40, Fade(BLACK, scoreAlpha));
                 }
                 else if(star_choose.level_3 == 2){
-                    DrawTexture(TwoStar, screenWidth/2 - TwoStar.width/2, screenHeight/2 - TwoStar.height/2 - 30, Fade(WHITE, scoreAlpha));
-                    DrawText("Gold+300", screenWidth/2 - MeasureText("Gold+300", 40)/2, screenHeight/2 +10, 40, Fade(BLACK, scoreAlpha));
+                    DrawTexture(TwoStar, screenWidth/2 - TwoStar.width/2, screenHeight/2 - TwoStar.height/2 - 130, Fade(WHITE, scoreAlpha));
+                    DrawText("Gold+300", screenWidth/2 - MeasureText("Gold+300", 40)/2, screenHeight/2 -90, 40, Fade(BLACK, scoreAlpha));
                 }
                 else if(star_choose.level_3 == 1){
-                    DrawTexture(OneStar, screenWidth/2 - OneStar.width/2, screenHeight/2 - OneStar.height/2 - 30, Fade(WHITE, scoreAlpha));
-                    DrawText("Gold+100", screenWidth/2 - MeasureText("Gold+100", 40)/2, screenHeight/2 +10, 40, Fade(BLACK, scoreAlpha));
+                    DrawTexture(OneStar, screenWidth/2 - OneStar.width/2, screenHeight/2 - OneStar.height/2 - 130, Fade(WHITE, scoreAlpha));
+                    DrawText("Gold+100", screenWidth/2 - MeasureText("Gold+100", 40)/2, screenHeight/2 -90, 40, Fade(BLACK, scoreAlpha));
                 }
             }
+            if(displayitem == true){
+                
+                DrawText("choose item", screenWidth/2 - MeasureText("choose item", 40)/2, 2*screenHeight/3 -50 , 40, Fade(RED, scoreAlpha));    
+            }
+            if(eventchoose <= 9){
+                DrawText("Community Chest and Chance", screenWidth/2 - MeasureText("Community Chest and Chance", 40)/2, 2*screenHeight/3 , 40, Fade(RED, scoreAlpha));
+                DrawText(text, screenWidth/2- MeasureText(text, 30)/2, 2*screenHeight/3 +50, 30,  Fade(BLACK, scoreAlpha));
+            }
         }
+        
+        
 
         int temp = 0;
         int temp2 = 0;
@@ -1099,12 +1289,17 @@ void DrawGame(void)
         DrawText(TextFormat("Total_Enemies:%04i", total_count_Enemies), 20, 40, 20, RED);
         DrawText(TextFormat("HP:%03i", player.HP), 20, 80, 20, RED);
         DrawText(TextFormat("gold:%04i", gold), 500, 20, 20, RED);
+        DrawText(TextFormat("AttackPower:%04i", player.AttackPower), 500, 40, 20, RED);
+        DrawText(TextFormat("speed:%2.1f", player.speed.x), 500, 70, 20, RED);
 
-        if (victory) DrawText("YOU WIN", screenWidth/2 - MeasureText("YOU WIN", 40)/2, screenHeight/2 - 40, 40, RED);
+        if (victory) DrawText("~YOU WIN~", screenWidth/2 - MeasureText("~YOU WIN~", 80)/2, screenHeight/2 - 40, 80, WHITE);
 
         if (pause) DrawText("GAME PAUSED", screenWidth/2 - MeasureText("GAME PAUSED", 40)/2, screenHeight/2 - 40, 40, RED);
     }
-    else DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, GetScreenHeight()/2 - 50, 20, RED);
+    else{
+        DrawText("YOU LOSE!!!", GetScreenWidth()/2 - MeasureText("YOU LOSE!!!", 40)/2, GetScreenHeight()/2-40 , 40, RED);
+        DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, GetScreenHeight()/2 , 20, RED);
+    }
 
     EndDrawing();
 }
