@@ -2,11 +2,9 @@
 #include <time.h>
 
 void buyPartner(int chosenType, Partner *partner, Vector2 playerPosition) {
-    // InitPartner(partner, (Vector2){player.rec.x, player.rec.y}, chosenType); 
     InitPartner(partner, playerPosition, chosenType);    
 }
 
-// void InitPartner(Partner *partner, Vector2 playerPosition, PartnerType type) {
 void InitPartner(Partner *partner, Vector2 playerPosition, PartnerType type) {
     partner->rec.width = 20;
     partner->rec.height = 20;
@@ -17,36 +15,37 @@ void InitPartner(Partner *partner, Vector2 playerPosition, PartnerType type) {
     partner->type = type;  // 设置类型
     partner->active = true;
     partner->attackTimer = 0.0f; // ?
-    // partner->hitCooldown = 0.5f;
-    // partner->lastHitTime = -partner->hitCooldown;  // 初始设置确保一开始可以被攻击
     partner->attackRate = 1.0;  // 每秒一次
     partner->shootTimer = 0.0;  // 初始化計時器
     partner->lastShootTime = GetTime();  // 設置初始射擊時間
     partner->lastEffectTime = GetTime();
     partner->effectActive = false;    
     partner->effectType = '\0';
-    
+    partner->effect_duration = 10;
+
     switch (type) {
         case PARTNER_TYPE_ONE:
             partner->HP = 90;
             partner->maxHealth = 90;
             partner->AttackPower = 25;
             partner->attackRate = 1.0f;
-            partner->effect_interval = (rand() % 5) + 15;
+            partner->CD = (rand() % 5) + 15; // CD: 15~20
+            partner->effect_duration = 10;
             break;
         case PARTNER_TYPE_TWO:
             partner->HP = 130;
             partner->maxHealth = 130;
             partner->AttackPower = 15;
             partner->attackRate = 1.0f;
-            partner->effect_interval = (rand() % 5) + 10;
+            partner->CD = (rand() % 5) + 10; // 10~15
             break;
         case PARTNER_TYPE_THREE:
             partner->HP = 50;
             partner->maxHealth = 50;
             partner->AttackPower = 35;
             partner->attackRate = 1.0f;
-            partner->effect_interval = (rand() % 5) + 15;
+            partner->CD = (rand() % 5) + 15; // 15~20
+            partner->effect_duration = 10;
             break;
     }
 }
@@ -111,13 +110,6 @@ void PartnerShoot(Partner *partner, Shoot *partnerBullets, float deltaTime, int 
     }
 }
 
-// void UpdatePartner(Partner *partner, Vector2 playerPosition) {
-    // if (!partner->active) return;
-
-    // 更新伙伴位置
-    // partner->rec.x = playerPosition.x - 30;
-    // partner->rec.y = playerPosition.y + 20;
-// }
 void UpdatePartner(Partner *partner, Vector2 playerPosition, Player *player) {
     if (!partner->active) return;
 
@@ -127,16 +119,15 @@ void UpdatePartner(Partner *partner, Vector2 playerPosition, Player *player) {
     float currentTime = GetTime();
 
     // PARTNER_TYPE_ONE 效果
-    static int origin_player_speed_x;
+    static int origin_player_speed_x; // only init in first time
     static int origin_player_speed_y;
     if (partner->type == PARTNER_TYPE_ONE) {
-        if ((currentTime - partner->lastEffectTime) >= partner->effect_interval) {
+        if (!(partner->effectActive) && ((currentTime - partner->lastEffectTime) >= partner->CD)) {
             origin_player_speed_x = player->speed.x; // 保存原始速度
             origin_player_speed_y = player->speed.y; // 保存原始速度
             player->speed.x += (origin_player_speed_x * 0.25);
             player->speed.y += (origin_player_speed_y * 0.25);
             partner->lastEffectTime = currentTime;
-            partner->effect_duration = 10;
             partner->effectActive = true;
             partner->effectType = 'S';
         }
@@ -146,30 +137,30 @@ void UpdatePartner(Partner *partner, Vector2 playerPosition, Player *player) {
             player->speed.y = origin_player_speed_y; // 恢復原始速度
             partner->effectActive = false;
             partner->effectType = '\0';
-            partner->effect_interval = (rand() % 5) + 10;
+            partner->CD = (rand() % 5) + 10; // Random CD
         }
     }
 
     // PARTNER_TYPE_TWO 效果
     if (partner->type == PARTNER_TYPE_TWO) {
-        if ((currentTime - partner->lastEffectTime) >= partner->effect_interval) {
+        if (!(partner->effectActive) && (currentTime - partner->lastEffectTime) >= partner->CD) {
             player->HP += (player->HP * 0.05);
-            if (player->HP > 100) player->HP = 100;
+            if (player->HP > 100) player->HP = 100; // this need player max HP, for now use 100
             partner->lastEffectTime = currentTime;
-            partner->effect_interval = (rand() % 5) + 10;
+            partner->CD = (rand() % 5) + 10;
             partner->effectActive = true;
             partner->effectType = 'H';
+            partner->effectActive = false;
         }
     }
 
     // PARTNER_TYPE_THREE 效果
     static int origin_player_attack;
     if (partner->type == PARTNER_TYPE_THREE) {
-        if ((currentTime - partner->lastEffectTime) >= partner->effect_interval) {
+        if (!(partner->effectActive) && (currentTime - partner->lastEffectTime) >= partner->CD) {
             origin_player_attack = player->AttackPower; // 保存原始攻擊力
             player->AttackPower += (origin_player_attack * 0.25);
             partner->lastEffectTime = currentTime;
-            partner->effect_duration = 7;
             partner->effectActive = true;
             partner->effectType = 'A';
         }
@@ -178,7 +169,7 @@ void UpdatePartner(Partner *partner, Vector2 playerPosition, Player *player) {
             player->AttackPower = origin_player_attack; // 恢復原始攻擊力
             partner->effectActive = false;
             partner->effectType = '\0';
-            partner->effect_interval = (rand() % 5) + 20;
+            partner->CD = (rand() % 5) + 20;
         }
     }
 }
