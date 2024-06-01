@@ -9,6 +9,7 @@ void InitPartner(Partner *partner, Vector2 playerPosition, PartnerType type);
 void UpdatePartner(Partner *partner, Vector2 playerPosition, Player *player);
 void CheckPartnerCollisionRecs(Partner *partner, Enemy *enemy, int *enemiesKill);
 void DrawPartner(Partner *partner);
-bool CheckPartnerCollisionRecs(Partner *partner, Enemy *enemy);
+// bool CheckPartnerCollisionRecs(Partner *partner, Enemy *enemy);
+void PartnerShoot(Partner *partner, Shoot *partnerBullets, float deltaTime, int numBullets, Enemy *enemies, int numEnemies, int *enemiesKill);
 
 #endif

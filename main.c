@@ -116,7 +116,9 @@ static Texture2D FullStar = { 0 };
 static Texture2D TwoStar = { 0 };
 static Texture2D OneStar = { 0 };
 
-
+static float effectStartTime = 0;
+static bool showEffect = false;
+static char effectType = '\0';
 //------------------------------------------------------------------------------------
 // Module Functions Declaration (local) 
 //------------------------------------------------------------------------------------
@@ -252,7 +254,8 @@ void InitGame(void)
     player.color = RED;
 
     // Initialize partner
-    int chosenType = 2; // PARTNER_TYPE_ONE、PARTNER_TYPE_TWO、PARTNER_TYPE_THREE
+    int chosenType = (rand() % 3); // PARTNER_TYPE_ONE、PARTNER_TYPE_TWO、PARTNER_TYPE_THREE
+    // int chosenType = 2; // 
     // InitPartner(&partner, (Vector2){player.rec.x, player.rec.y}, chosenType);
     buyPartner(chosenType, &partner, (Vector2){player.rec.x, player.rec.y});
 
@@ -262,8 +265,6 @@ void InitGame(void)
 
     // Initialize score_system
     gold = 0;
-    final_score = 0;
-    add_score = 0;
     store_enter = false;
     star_choose.level_1 = 0;
     star_choose.level_2 = 0;
@@ -829,10 +830,24 @@ void UpdateGame(void)
                             }
                     }
                 }
-                
-                // Partner movement
-                UpdatePartner(&partner, (Vector2){ player.rec.x, player.rec.y },&player);
-                PartnerShoot(&partner, &partner_shoot, deltaTime, NUM_SHOOTS, &enemy, NUM_MAX_ENEMIES, &enemiesKill, &total_count_Enemies, &totalEnemies);
+                UpdatePartner(&partner, (Vector2){ player.rec.x, player.rec.y }, &player);
+                            float currentTime = GetTime();
+                if (partner.effectActive) {
+                    if ((currentTime - partner.lastEffectTime) < 1) {
+                        showEffect = true;
+                        effectType = partner.effectType;
+                        effectStartTime = currentTime;
+                    } else {
+                        if ((effectType == 'H' && (currentTime - effectStartTime) >= 3) || 
+                            (effectType == 'A' && (currentTime - effectStartTime) >= 10) || 
+                            (effectType == 'S' && (currentTime - effectStartTime) >= 10)) {
+                            showEffect = false;
+                        }
+                    }
+                }
+                // PartnerShoot(&partner, &partner_shoot, deltaTime, NUM_SHOOTS, &enemy, NUM_MAX_ENEMIES, &score, &enemiesKill);
+                PartnerShoot(&partner, &partner_shoot, deltaTime, NUM_SHOOTS, &enemy, NUM_MAX_ENEMIES, &enemiesKill);
+
 
                 // Player collision with enemy
                 for (int i = 0; i < activeEnemies; i++)
@@ -851,7 +866,7 @@ void UpdateGame(void)
                             enemy[i].active = true;  // 重新激活敌人
                         }
                     }
-                    CheckPartnerCollisionRecs(&partner, &enemy[i], &enemiesKill, &total_count_Enemies, &partner_shoot[i]);
+                    CheckPartnerCollisionRecs(&partner, &enemy[i], &enemiesKill);
                 }
 
                 if(player.HP <= 0) gameOver = true;
@@ -1176,6 +1191,20 @@ void DrawGame(void)
         DrawRectangleRec(player.rec, player.color);
         // Draw partner
         DrawPartner(&partner);
+        
+        float currentTime = GetTime();
+        if (showEffect) {
+            int fontSize = player.rec.width; // 字體大小設置為玩家寬度
+            if (effectType == 'H' && (currentTime - effectStartTime) < 3) {
+                DrawText("+", player.rec.x + player.rec.width, player.rec.y - player.rec.height / 2, fontSize, GREEN);
+            } else if (effectType == 'A' && (currentTime - effectStartTime) < 7) {
+                DrawText("↑", player.rec.x + player.rec.width, player.rec.y - player.rec.height / 2, fontSize, ORANGE);
+            } else if (effectType == 'S' && (currentTime - effectStartTime) < 10) {
+                DrawText("↑", player.rec.x + player.rec.width, player.rec.y - player.rec.height / 2, fontSize, BLUE); // 使用藍色箭頭表示速度增加
+            } else {
+                showEffect = false;
+            }
+        }
 
         // Draw wave text
         if (difficulty == EASY) DrawText("EASY", screenWidth/2 - MeasureText("EASY", 40)/2, screenHeight/2, 40, Fade(BLACK, alpha));

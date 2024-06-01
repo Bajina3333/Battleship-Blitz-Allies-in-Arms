@@ -64,7 +64,7 @@ void InitPartnerShoot(Partner *partner, Shoot *shoot, int NUM_SHOOTS) {
     }
 }
 
-void PartnerShoot(Partner *partner, Shoot *partnerBullets, float deltaTime, int numBullets, Enemy *enemies, int numEnemies, int *score, int *enemiesKill) {
+void PartnerShoot(Partner *partner, Shoot *partnerBullets, float deltaTime, int numBullets, Enemy *enemies, int numEnemies, int *enemiesKill) {
     if (partner->active) {
         partner->attackTimer += deltaTime;
 
@@ -96,7 +96,7 @@ void PartnerShoot(Partner *partner, Shoot *partnerBullets, float deltaTime, int 
                     if (enemies[j].HP <= 0) {
                         enemies[j].active = false; // 敵人死亡
                         (*enemiesKill)++;
-                        *score += 100;
+                        // *score += 100;
                         enemies[j].rec.x = GetRandomValue(-100, -1); // 可選擇將敵人移出屏幕
                         enemies[j].rec.y = GetRandomValue(-100, -1);
                     }
@@ -145,7 +145,7 @@ void UpdatePartner(Partner *partner, Vector2 playerPosition, Player *player) {
     if (partner->type == PARTNER_TYPE_TWO) {
         if (!(partner->effectActive) && (currentTime - partner->lastEffectTime) >= partner->CD) {
             player->HP += (player->HP * 0.05);
-            if (player->HP > 100) player->HP = 100; // this need player max HP, for now use 100
+            if (player->HP > player->MaxHP) player->HP = player->MaxHP; // this need player max HP, for now use 100
             partner->lastEffectTime = currentTime;
             partner->CD = (rand() % 5) + 10;
             partner->effectActive = true;
@@ -171,7 +171,7 @@ void UpdatePartner(Partner *partner, Vector2 playerPosition, Player *player) {
             partner->effectType = '\0';
             partner->CD = (rand() % 5) + 20;
         }
-    }*/
+    }
 }
 
 
