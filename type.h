@@ -2,7 +2,7 @@
 #define TYPES_H
 
 #include "raylib.h"
-#include "raygui.h" 
+// #include "raygui.h" 
 
 // 定義敵人波次的枚舉類型
 typedef enum { FIRST = 0, SECOND, THIRD, BOSSWAVE} EnemyWave;
