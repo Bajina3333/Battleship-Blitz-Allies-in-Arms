@@ -2,47 +2,45 @@
 #define TYPES_H
 
 #include "raylib.h"
-#include "raygui.h" 
+// #include "raygui.h" 
 
 // 定義敵人波次的枚舉類型
-typedef enum { FIRST = 0, SECOND, THIRD } EnemyWave;
-typedef enum {STANDARD, STRONG}EnemyType;
+typedef enum { FIRST = 0, SECOND, THIRD, BOSSWAVE} EnemyWave;
+typedef enum {STANDARD, STRONG, BOSS}EnemyType;
+typedef enum {EASY, MEDIUM, HARD, BOSSLEVEL} Difficulty;
 
-// 玩家結構
-// typedef struct Player {
-    // Rectangle rec;
-    // Vector2 speed;
-    // Color color;
-// } Player;
+extern int standard_num;
+extern int Strong_num;
+
 typedef struct Player{
     int HP;
     int AttackPower;
+    int MaxHP;
+    
     Rectangle rec;
     Vector2 speed;
-    Color color;
+    Color color  
 } Player;
 
 // 敵人結構(Boss)
-typedef struct Boss{
+/*typedef struct Boss{
     Rectangle rec;
     bool active;
     Color color;
     int HP;
     int Atk;
     float frequency;
-}Boss;
+}Boss;*/
 
 //敵人結構
 typedef struct Enemy{
     Rectangle rec;
     Vector2 speed;
     bool active;
-    // int attackPower;
     int AttackPower;
     Color color;
     int HP;
-    // int Atk;
-    // float frequency;
+    float frequency;
     EnemyType type;
 } Enemy;
 
@@ -54,16 +52,6 @@ typedef struct Shoot {
     Color color;
 } Shoot;
 
-//////////////////////////////////
-// 夥伴結構
-// typedef struct Partner {
-    // Rectangle rec;
-    // int health;
-    // int attackPower;
-    // float attackRate;
-    // bool active;
-    // float attackTimer;
-// } Partner;
 typedef enum {
     PARTNER_TYPE_ONE,
     PARTNER_TYPE_TWO,
@@ -78,19 +66,15 @@ typedef struct Partner {
     float attackRate;
     bool active;
     float attackTimer;
-    // float hitCooldown;  // 用于受击冷却
-    // float lastHitTime;  // 上次被攻击的时间
     float shootTimer;  // 跟踪下一次射擊的計時器
     float lastShootTime;  // 上一次射擊的時間
+    float lastEffectTime;
+    float CD;
+    float effect_duration;
+    bool effectActive;
+    char effectType;
     PartnerType type;  // 添加一个类型字段
 } Partner;
-
-// typedef struct Shoot {
-    // Rectangle rec;
-    // Vector2 speed;
-    // bool active;
-    // Color color;
-// } Shoot;
 
 typedef struct Star_choose{ //Use 1, 2, 3 represent how many stars are in level
     int level_1;
@@ -98,7 +82,6 @@ typedef struct Star_choose{ //Use 1, 2, 3 represent how many stars are in level
     int level_3;
 }Star_choose;
 
-// static Shoot* partnerBullets;
 ///////////////////////////////////////
 // 其他共享結構和宣告 ...
 
