@@ -282,7 +282,7 @@ void InitGame(int n)
     gamechoose = false;
     victory = false;
     smooth = false;
-    wave = THIRD;
+    wave = FIRST;
     totalEnemies = EASY_WAVE;
     total_count_Enemies = 0;
     activeEnemies = FIRST_WAVE_1;
