@@ -254,8 +254,9 @@ void InitGame(void)
     player.color = RED;
 
     // Initialize partner
-    int chosenType = (rand() % 3); // PARTNER_TYPE_ONE、PARTNER_TYPE_TWO、PARTNER_TYPE_THREE
-    // int chosenType = 2; // 
+    int chosenType = (rand() % 3); 
+    // PARTNER_TYPE_ONE、PARTNER_TYPE_TWO、PARTNER_TYPE_THREE
+    // int chosenType = 1; // 
     // InitPartner(&partner, (Vector2){player.rec.x, player.rec.y}, chosenType);
     buyPartner(chosenType, &partner, (Vector2){player.rec.x, player.rec.y});
 

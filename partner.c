@@ -143,15 +143,14 @@ void UpdatePartner(Partner *partner, Vector2 playerPosition, Player *player) {
 
     // PARTNER_TYPE_TWO 效果
     if (partner->type == PARTNER_TYPE_TWO) {
-        if (!(partner->effectActive) && (currentTime - partner->lastEffectTime) >= partner->CD) {
+        if ((currentTime - partner->lastEffectTime) >= partner->CD) {
             player->HP += (player->HP * 0.05);
             if (player->HP > player->MaxHP) player->HP = player->MaxHP; // this need player max HP, for now use 100
             partner->lastEffectTime = currentTime;
             partner->CD = (rand() % 5) + 10;
             partner->effectActive = true;
             partner->effectType = 'H';
-            partner->effectActive = false;
-        }
+        } 
     }
 
     // PARTNER_TYPE_THREE 效果
