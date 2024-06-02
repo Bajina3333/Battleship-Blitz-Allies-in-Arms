@@ -53,7 +53,7 @@ int Choose_Item(Player *player)
 int Event(Player *player, int *gold, Shoot *shoot ,int *ShootControl, Partner *partner ,int *cureHP, char *text)
 {   
     const char *words = "";
-    int Event_type = GetRandomValue(1,27);
+    int Event_type = GetRandomValue(1,22);
     switch(Event_type)
     {   
         case 1:{ // Partner Attraction: Gain benefits when you have a partner

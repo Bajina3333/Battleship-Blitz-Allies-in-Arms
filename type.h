@@ -2,7 +2,7 @@
 #define TYPES_H
 
 #include "raylib.h"
-// #include "raygui.h" 
+#include "raygui.h" 
 
 // 定義敵人波次的枚舉類型
 typedef enum { FIRST = 0, SECOND, THIRD, BOSSWAVE} EnemyWave;
@@ -16,10 +16,9 @@ typedef struct Player{
     int HP;
     int AttackPower;
     int MaxHP;
-    
     Rectangle rec;
     Vector2 speed;
-    Color color  
+    Color color;
 } Player;
 
 // 敵人結構(Boss)
@@ -66,6 +65,8 @@ typedef struct Partner {
     float attackRate;
     bool active;
     float attackTimer;
+    // float hitCooldown;  // 用于受击冷却
+    // float lastHitTime;  // 上次被攻击的时间
     float shootTimer;  // 跟踪下一次射擊的計時器
     float lastShootTime;  // 上一次射擊的時間
     float lastEffectTime;
@@ -81,6 +82,11 @@ typedef struct Star_choose{ //Use 1, 2, 3 represent how many stars are in level
     int level_2;
     int level_3;
 }Star_choose;
+
+typedef struct Button {
+    Rectangle rect;
+    Color color;
+} Button;
 
 ///////////////////////////////////////
 // 其他共享結構和宣告 ...
