@@ -21,3 +21,5 @@ At the end of each wave, the player has a 1/3 chance to trigger a "Community Che
 
 在每波遊戲結束後，玩家有1/3的機率觸發“機會與命運”事件。這些事件包括九種不同的好壞情況，如中獎、掉入黑洞引力場導致速度減慢、損失所有金幣、或因為夥伴獲得額外的增益效果，這些事件將對接下來的遊戲進行產生顯著影響。
 
+![image](https://github.com/Bajina3333/Battleship-Blitz-Allies-in-Arms/blob/main/img/task.png)
+
