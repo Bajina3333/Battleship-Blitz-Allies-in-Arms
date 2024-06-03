@@ -126,13 +126,21 @@ static Texture2D partner_2 = { 0 };
 static Texture2D partner_3 = { 0 };
 
 static Texture2D player_1 = { 0 };
+static Texture2D player_1show = { 0 };
 static Texture2D player_2 = { 0 };
+static Texture2D player_2show = { 0 };
 static Texture2D player_3 = { 0 };
+static Texture2D player_3show = { 0 };
 
 static Texture2D FullStar = { 0 };
 static Texture2D TwoStar = { 0 };
 static Texture2D OneStar = { 0 };
 static Texture2D items[3];
+
+static Music win;
+static Music level;
+static Music boss_music;
+static Music lose;
 
 static float effectStartTime = 0;
 static bool showEffect = false;
@@ -145,7 +153,7 @@ static void InitGame(int n);         // Initialize game
 static void UpdateGame(void);       // Update game (one frame)
 static void DrawGame(void);         // Draw game (one frame)
 static void UnloadGame(void);       // Unload game
-static void UpdateDrawFrame(void);  // Update and Draw (one frame)
+static void UpdateDrawFrame(void); // Update and Draw (one frame)   
 //unactive all shoots
 void ResetEnemyBullets(void) { 
     for (int i = 0; i < NUM_MAX_ENEMIES; i++) {
@@ -195,14 +203,35 @@ int main(void)
     partner_1 = LoadTexture("img/partner/attack.png");
     partner_2 = LoadTexture("img/partner/recover.png");
     partner_3 = LoadTexture("img/partner/sheid.png");
+    
 
     player_1 = LoadTexture("img/player/1.png");
+    player_1show = LoadTexture("img/player/1show.png");
     player_2 = LoadTexture("img/player/2.png");
+    player_2show = LoadTexture("img/player/2show.png");
     player_3 = LoadTexture("img/player/3.png");
+    player_3show = LoadTexture("img/player/3show.png");
     
     FullStar = LoadTexture("img/system/FullStar.png"); //從main開始算位置
     TwoStar = LoadTexture("img/system/TwoStar.png");
     OneStar = LoadTexture("img/system/OneStar.png");
+
+    InitAudioDevice();
+
+    win = LoadMusicStream("music/win.mp3");
+    win.looping = true;
+    level = LoadMusicStream("music/level.mp3");
+    level.looping = true;
+    boss_music = LoadMusicStream("music/Boss.mp3");
+    boss_music.looping = true;
+    lose = LoadMusicStream("music/gameover.mp3");
+    lose.looping = false;
+
+    SetMusicVolume(win, 0.7f);
+    SetMusicVolume(lose, 0.7f);
+    SetMusicVolume(level, 0.7f);
+    SetMusicVolume(boss_music, 0.7f);
+    
 
     InitGame(1);
 
@@ -215,6 +244,10 @@ int main(void)
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
+        UpdateMusicStream(level);
+        UpdateMusicStream(boss_music);
+        UpdateMusicStream(win);
+        UpdateMusicStream(lose);
         // Update and Draw
         //----------------------------------------------------------------------------------
         UpdateDrawFrame();
@@ -224,6 +257,8 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
     UnloadGame();        // Unload loaded data (textures, sounds, models...)
+
+    CloseAudioDevice();
 
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
@@ -351,6 +386,10 @@ void InitGame(int n)
     partner_3.width = 30;
     partner_3.height = 30;
 
+    PauseMusicStream(level);
+    StopMusicStream(boss_music);
+    StopMusicStream(win);
+    StopMusicStream(lose);
 
     // Initialize partner
     int chosenType = 0;
@@ -467,19 +506,47 @@ void UpdateGame(void)
         
     }
     else if(gameOver){
-         if (is_mouse_over_button(button_start) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        StopMusicStream(level);
+        PlayMusicStream(lose);
+        if (is_mouse_over_button(button_start) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
+            StopMusicStream(lose);
             gameOver = false;
             gamechoose = true;
         }        
         if (is_mouse_over_button(button_quit) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
-             exit(1);
+            StopMusicStream(lose);
+            exit(1);
         }
     }
     else if (gameaction && victory != true)
     {
-        if (IsKeyPressed('P')) pause = !pause;
+        if (IsKeyPressed('P')){
+            if(pause == true){
+                if(victory == true){
+                    ResumeMusicStream(win);
+                }
+                else if(difficulty == BOSSLEVEL){
+                    ResumeMusicStream(boss_music);
+                }
+                else{
+                    ResumeMusicStream(level);
+                }
+            }
+            else{
+                if(victory == true){
+                    PauseMusicStream(win);
+                }
+                else if(difficulty == BOSSLEVEL){
+                    PauseMusicStream(boss_music);
+                }
+                else{
+                    PauseMusicStream(level);
+                }
+            }
+            pause = !pause;
+        }
 
         if (!pause)
         {
@@ -497,6 +564,7 @@ void UpdateGame(void)
                     if(difficulty == EASY){
                         if (wave == FIRST) 
                         {   
+                            ResumeMusicStream(level);
                             ShootControl--;
                             if(ShootControl<0)ShootControl = -1;
                             activeEnemies = SECOND_WAVE_1;
@@ -505,6 +573,7 @@ void UpdateGame(void)
                         } 
                         else if (wave == SECOND) 
                         {
+                            ResumeMusicStream(level);
                             ShootControl--;
                             activeEnemies = THIRD_WAVE_1;
                             wave = THIRD;
@@ -512,8 +581,8 @@ void UpdateGame(void)
                         } 
                         else if (wave == THIRD) 
                         {
+                            ResumeMusicStream(level);
                             displayitem = false;
-                            
                             ShootControl--;
                             activeEnemies = FIRST_WAVE_2;
                             difficulty = MEDIUM;
@@ -525,19 +594,21 @@ void UpdateGame(void)
                     if(difficulty == MEDIUM){
                         if (wave == FIRST) 
                         {
+                            ResumeMusicStream(level);
                             ShootControl--;
                             wave = SECOND;
                             activeEnemies = SECOND_WAVE_2;
                         } 
                         else if (wave == SECOND) 
                         {
+                            ResumeMusicStream(level);
                             ShootControl--;
                             wave = THIRD;
                             activeEnemies = THIRD_WAVE_2;
                         } 
                         else if (wave == THIRD) 
                         {
-                            
+                            ResumeMusicStream(level);
                             displayitem = false;
                             ShootControl--;
                             wave = FIRST;
@@ -549,17 +620,21 @@ void UpdateGame(void)
                     if(difficulty == HARD){
                         if (wave == FIRST) 
                         {
+                            ResumeMusicStream(level);
                             ShootControl--;
                             wave = SECOND;
                             activeEnemies = SECOND_WAVE_3;
                         } 
                         else if (wave == SECOND) 
                         {
+                            ResumeMusicStream(level);
                             ShootControl--;
                             wave = THIRD;
                             activeEnemies = THIRD_WAVE_3;
                         } 
                         else if (wave == THIRD) {
+                            StopMusicStream(level);
+                            PlayMusicStream(boss_music);
                             ShootControl--;
                             wave = BOSSWAVE;
                             activeEnemies = BOSS_1;
@@ -595,6 +670,7 @@ void UpdateGame(void)
                     {
                         case FIRST:
                         {
+                            PlayMusicStream(level);
                             totalEnemies = EASY_WAVE; 
                             if (!smooth)
                             {
@@ -604,6 +680,7 @@ void UpdateGame(void)
                             }
 
                             if (smooth) alpha -= 0.02f;
+                            
 
                         } break;
                         case SECOND:
@@ -801,7 +878,6 @@ void UpdateGame(void)
                     {
                         case FIRST:
                         {
-                            
                             totalEnemies = HARD_WAVE;
                             if (!smooth)
                             {
@@ -1162,6 +1238,7 @@ void UpdateGame(void)
                     if(difficulty == EASY){
                         if (wave == FIRST) 
                         {
+                            PauseMusicStream(level);
                             smooth = false;
                             alpha = 0.0f;
                             ResetEnemyBullets();
@@ -1174,6 +1251,7 @@ void UpdateGame(void)
                         } 
                         else if (wave == SECOND) 
                         {
+                            PauseMusicStream(level);
                             smooth = false;
                             alpha = 0.0f;
                             ResetEnemyBullets();
@@ -1185,6 +1263,7 @@ void UpdateGame(void)
                         } 
                         else if (wave == THIRD) 
                         {
+                            PauseMusicStream(level);
                             smooth = false;
                             alpha = 0.0f;
                             ResetEnemyBullets();
@@ -1200,6 +1279,7 @@ void UpdateGame(void)
                     if(difficulty == MEDIUM){
                         if (wave == FIRST) 
                         {
+                            PauseMusicStream(level);
                             smooth = false;
                             alpha = 0.0f;
                             ResetEnemyBullets();
@@ -1211,6 +1291,7 @@ void UpdateGame(void)
                         } 
                         else if (wave == SECOND) 
                         {
+                            PauseMusicStream(level);
                             smooth = false;
                             alpha = 0.0f;
                             ResetEnemyBullets();
@@ -1222,6 +1303,7 @@ void UpdateGame(void)
                         } 
                         else if (wave == THIRD) 
                         {
+                            PauseMusicStream(level);
                             smooth = false;
                             alpha = 0.0f;
                             ResetEnemyBullets();
@@ -1237,6 +1319,7 @@ void UpdateGame(void)
                     if(difficulty == HARD){
                         if (wave == FIRST) 
                         {
+                            PauseMusicStream(level);
                             smooth = false;
                             alpha = 0.0f;
                             ResetEnemyBullets();
@@ -1248,6 +1331,7 @@ void UpdateGame(void)
                         } 
                         else if (wave == SECOND) 
                         {
+                            PauseMusicStream(level);
                             smooth = false;
                             alpha = 0.0f;
                             ResetEnemyBullets();
@@ -1259,6 +1343,7 @@ void UpdateGame(void)
                         } 
                         else if (wave == THIRD) 
                         {
+                            PauseMusicStream(level);
                             smooth = false;
                             alpha = 0.0f;
                             ResetEnemyBullets();
@@ -1277,6 +1362,9 @@ void UpdateGame(void)
                         alpha = 0.0f;
                         enemy[0].active = false;
                         victory = true;
+                        StopMusicStream(boss_music);
+                        StopMusicStream(level);
+                        PlayMusicStream(win);
                     }
 
                     enemiesKill = 0;
@@ -1317,7 +1405,7 @@ void DrawGame(void)
             button_quit.color = RED;
         }
         DrawText("WELCOME TO", screenWidth/2 - MeasureText("WELCOME TO", 40)/2, 200, 40, RED);
-        DrawText("Battleship Blitz: Allies in Arms", screenWidth/2 - MeasureText("Battleship Blitz: Allies in Arms", 60)/2, 350, 60, RED);
+        DrawText("Battleship Blitz: Allies in Arms", screenWidth/2 - MeasureText("Battleship Blitz: Allies in Arms", 70)/2, 340, 70, RED);
         DrawRectangleRec(button_start.rect, button_start.color);
         DrawText("start", button_start.rect.x + button_start.rect.width / 2 - MeasureText("start", 20) / 2, button_start.rect.y + button_start.rect.height / 2 - 20 / 2, 20, WHITE);
         DrawRectangleRec(button_quit.rect, button_quit.color);
@@ -1358,12 +1446,13 @@ void DrawGame(void)
         } else {
             button_3.color = RED;
         }
+        DrawText("Player Choose", 750 -  MeasureText("Player Choose", 70) / 2, 100, 70, RED);
         DrawRectangleRec(button_1.rect, button_1.color);
-        DrawText("player1", button_1.rect.x + button_1.rect.width / 2 - MeasureText("player1", 20) / 2, button_1.rect.y + button_1.rect.height / 2 - 20 / 2, 20, WHITE);
+        DrawTextureEx(player_1show, (Vector2){button_1.rect.x + button_1.rect.width / 2 - player_1show.width/2 , button_1.rect.y + button_1.rect.height / 2 - player_1show.height/2 }, 0.0f, 1.0f, RAYWHITE);
         DrawRectangleRec(button_2.rect, button_2.color);
-        DrawText("player2", button_2.rect.x + button_2.rect.width / 2 - MeasureText("player2", 20) / 2, button_2.rect.y + button_2.rect.height / 2 - 20 / 2, 20, WHITE);
+        DrawTextureEx(player_2show, (Vector2){button_2.rect.x + button_2.rect.width / 2 - player_2show.width/2 -4, button_2.rect.y + button_2.rect.height / 2 - player_2show.height/2 }, 0.0f, 1.05f, RAYWHITE);
         DrawRectangleRec(button_3.rect, button_3.color);
-        DrawText("player3", button_3.rect.x + button_3.rect.width / 2 - MeasureText("player3", 20) / 2, button_3.rect.y + button_3.rect.height / 2 - 20 / 2, 20, WHITE);
+        DrawTextureEx(player_3show, (Vector2){button_3.rect.x + button_3.rect.width / 2 - player_3show.width/2 +1, button_3.rect.y + button_3.rect.height / 2 - player_3show.height/2 +5}, 0.0f, 1.0f, RAYWHITE);
     
     }else if(gameaction)
     {
@@ -1405,13 +1494,12 @@ void DrawGame(void)
         if (showEffect) {
             int fontSize = player.rec.width; // 字體大小設置為玩家寬度
             if (effectType == 'H' && (currentTime - effectStartTime) < 3) {
-                DrawText("+", player.rec.x + player.rec.width, player.rec.y - player.rec.height / 2, 20, GRAY);
+                DrawText("+", player.rec.x + player.rec.width-5, player.rec.y - player.rec.height / 2 +5, 25, GRAY);
             } else if (effectType == 'A' && (currentTime - effectStartTime) < 7) {
-                DrawText("^", player.rec.x + player.rec.width, player.rec.y - player.rec.height / 2, 40, ORANGE);
+                DrawText("^", player.rec.x + player.rec.width-5, player.rec.y - player.rec.height / 2 +5, 45, ORANGE);
             } else if (effectType == 'S' && (currentTime - effectStartTime) < 10) {
-                DrawText("^", player.rec.x + player.rec.width, player.rec.y - player.rec.height / 2, 40, BLUE); // 使用藍色箭頭表示速度增加
-            } else {
-                showEffect = false;
+                DrawText("^", player.rec.x + player.rec.width-5, player.rec.y - player.rec.height / 2 +5, 45, BLUE); // 使用藍色箭頭表示速度增加
+            } else {                showEffect = false;
             }
         }
 
@@ -1483,6 +1571,7 @@ void DrawGame(void)
             if(displayitem == true){
                 switch(itemchoose){
                     case 1:{
+                        DrawText("Effect: player_AttackPower *1.6", screenWidth/2 - MeasureText("Effect: player_AttackPower *1.6", 30)/2, 2*screenHeight/3 -70, 30, Fade(BLACK, scoreAlpha));
                         DrawTexture(energy_beam, screenWidth/2 -  energy_beam.width/2, screenHeight/2 - energy_beam.height/2 +150, Fade(WHITE, scoreAlpha));
                         if(difficulty == EASY){
                             items[0] = energy_beam;
@@ -1502,6 +1591,7 @@ void DrawGame(void)
                         break;
                     }
                     case 2:{
+                        DrawText("Effect: player_AttackPower +30", screenWidth/2 - MeasureText("Effect: player_AttackPower +30", 30)/2, 2*screenHeight/3 -70, 30, Fade(BLACK, scoreAlpha));
                         DrawTexture(machine_gun, screenWidth/2 -  machine_gun.width/2, screenHeight/2 - machine_gun.height/2 +150, Fade(WHITE, scoreAlpha));
                         if(difficulty == EASY){
                             items[0] = machine_gun;
@@ -1521,6 +1611,7 @@ void DrawGame(void)
                         break;
                     }
                     case 3:{
+                        DrawText("Effect: player_speed +3", screenWidth/2 - MeasureText("Effect: player_speed +3", 30)/2, 2*screenHeight/3 -70, 30, Fade(BLACK, scoreAlpha));
                         DrawTexture(booster, screenWidth/2 -  booster.width/2, screenHeight/2 - booster.height/2 +150, Fade(WHITE, scoreAlpha));
                         if(difficulty == EASY){
                             items[0] = booster;
@@ -1540,6 +1631,7 @@ void DrawGame(void)
                         break;
                     }
                     case 4:{
+                        DrawText("Effect: player_HP +100", screenWidth/2 - MeasureText("Effect: player_HP +100", 30)/2, 2*screenHeight/3 -70, 30, Fade(BLACK, scoreAlpha));
                         DrawTexture(cure, screenWidth/2 -  cure.width/2, screenHeight/2 - cure.height/2 +150, Fade(WHITE, scoreAlpha));
                         if(difficulty == EASY){
                             items[0] = cure;
@@ -1559,6 +1651,7 @@ void DrawGame(void)
                         break;
                     }
                     case 5:{
+                        DrawText("Effect: player_HP +25", screenWidth/2 - MeasureText("Effect: player_HP +25", 30)/2, 2*screenHeight/3 -70, 30, Fade(BLACK, scoreAlpha));
                         DrawTexture(healing_potion, screenWidth/2 -  healing_potion.width/2, screenHeight/2 - healing_potion.height/2 +150, Fade(WHITE, scoreAlpha));
                         if(difficulty == EASY){
                             items[0] = healing_potion;
@@ -1578,6 +1671,7 @@ void DrawGame(void)
                         break;
                     }
                     case 6:{
+                        DrawText("Effect: player_MaxHP +100", screenWidth/2 - MeasureText("Effect: player_MaxHP +100", 30)/2, 2*screenHeight/3 -70, 30, Fade(BLACK, scoreAlpha));
                         DrawTexture(armor, screenWidth/2 - armor.width/2, screenHeight/2 - armor.height/2 +150, Fade(WHITE, scoreAlpha));
                         if(difficulty == EASY){
                             items[0] = armor;
@@ -1597,6 +1691,7 @@ void DrawGame(void)
                         break;
                     }
                     case 7:{
+                        DrawText("Effect: player_AttackPower *2", screenWidth/2 - MeasureText("Effect: player_AttackPower *2", 30)/2, 2*screenHeight/3 -70, 30, Fade(BLACK, scoreAlpha));
                         DrawTexture(plasma_cannon, screenWidth/2 - plasma_cannon.width/2, screenHeight/2 - plasma_cannon.height/2 +150, Fade(WHITE, scoreAlpha));
                         if(difficulty == EASY){
                             items[0] = plasma_cannon;
@@ -1617,7 +1712,7 @@ void DrawGame(void)
                     }
                     default: break;
                 }
-                DrawText("You have got an item", screenWidth/2 - MeasureText("You have got an item", 40)/2, 2*screenHeight/3 -80 , 40, Fade(RED, scoreAlpha));    
+                DrawText("You have got an item", screenWidth/2 - MeasureText("You have got an item", 40)/2, 2*screenHeight/3 -120, 40, Fade(RED, scoreAlpha));    
             }
             if(eventchoose <= 9){
                 DrawText("Community Chest and Chance", screenWidth/2 - MeasureText("Community Chest and Chance", 40)/2, 2*screenHeight/3 +50 , 40, Fade(RED, scoreAlpha));
@@ -1625,8 +1720,6 @@ void DrawGame(void)
             }
         }
         
-        
-
         int temp = 0;
         int temp2 = 0;
 
@@ -1666,12 +1759,13 @@ void DrawGame(void)
                 DrawRectangleRec(partner_shoot[i].rec, partner_shoot[i].color);
             }
         }
-        DrawText(TextFormat("EnemiesKill:%04i", enemiesKill), 20, 20, 20, RED);
-        DrawText(TextFormat("Total_Enemies:%04i", total_count_Enemies), 20, 80, 20, RED);
-        DrawText(TextFormat("player_HP:%03i", player.HP), 1300, 20, 20, RED);
-        DrawText(TextFormat("gold:%04i", gold), 20,40, 20, RED);
-        DrawText(TextFormat("AttackPower:%04i", player.AttackPower), 1300, 60, 20, RED);
-        DrawText(TextFormat("speed:%2.1f", player.speed.x), 1300, 80, 20, RED);
+        DrawText(TextFormat("EnemiesKill:%04i", enemiesKill), 20, 20, 25, RED);
+        DrawText(TextFormat("Total_Enemies:%04i", total_count_Enemies), 20, 100, 25, RED);
+        DrawText(TextFormat("player_HP:%03i", player.HP), 1250, 20, 25, RED);
+        DrawText(TextFormat("gold:%04i", gold), 20, 60, 25, RED);
+        DrawText(TextFormat("AttackPower:%04i", player.AttackPower), 1250, 80, 25, RED);
+        DrawText(TextFormat("speed:%2.1f", player.speed.x), 1250, 110, 25, RED);
+
 
         if (victory){
             items[2].height = 130;
@@ -1680,10 +1774,13 @@ void DrawGame(void)
             const char *GoldText = TextFormat("Gold:%04i", gold);
             int GoldTextWidth = MeasureText(GoldText, 60);
             DrawText(GoldText, screenWidth/2 - GoldTextWidth/2 , screenHeight/2 - 105, 60, GOLD);
-            DrawRectangle(400, 405, 700, 200, WHITE);
+            DrawRectangle(300, 405, 900, 200, WHITE);
             DrawTexture(items[0], 500 - items[0].width/2 , 525 - items[0].height/2, WHITE);
             DrawTexture(items[1], screenWidth/2 - items[1].width/2, 525 - items[1].height/2, WHITE);
             DrawTexture(items[2], 1000 - items[2].width/2 , 525 - items[2].height/2, WHITE);
+            //DrawTexture(energy_beam, 500 - energy_beam.width/2 , 525 - energy_beam.height/2, WHITE);
+            //DrawTexture(energy_beam, screenWidth/2 - energy_beam.width/2, 525 - energy_beam.height/2, WHITE);
+            //DrawTexture(energy_beam, 1000 - energy_beam.width/2 , 525 - energy_beam.height/2, WHITE);
         }
 
         if (pause) DrawText("GAME PAUSED", screenWidth/2 - MeasureText("GAME PAUSED", 40)/2,  40, 40, RED);
@@ -1725,10 +1822,20 @@ void UnloadGame(void)
     UnloadTexture(partner_1);
     UnloadTexture(partner_2);
     UnloadTexture(partner_3);
+    UnloadTexture(player_1);
+    UnloadTexture(player_1show);
+    UnloadTexture(player_2);
+    UnloadTexture(player_2show);
+    UnloadTexture(partner_3);
+    UnloadTexture(player_3show);
     UnloadTexture(FullStar);
     UnloadTexture(TwoStar);
     UnloadTexture(OneStar);
     
+    UnloadMusicStream(win);
+    UnloadMusicStream(lose);
+    UnloadMusicStream(level);
+    UnloadMusicStream(boss_music);
     // TODO: Unload all dynamic loaded data (textures, sounds, models...)
 }
 

@@ -142,7 +142,7 @@ void UpdatePartner(Partner *partner, Vector2 playerPosition, Player *player) {
         // PARTNER_TYPE_TWO 效果
     if (partner->type == PARTNER_TYPE_TWO) {
         if ((currentTime - partner->lastEffectTime) >= partner->CD) {
-            player->HP += (player->HP * 0.05);
+            player->HP += 10;
             if (player->HP > player->MaxHP) player->HP = player->MaxHP; // this need player max HP, for now use 100
             partner->lastEffectTime = currentTime;
             partner->CD = (rand() % 5) + 10;
@@ -192,6 +192,6 @@ void CheckPartnerCollisionRecs(Partner *partner, Enemy *enemy, int *enemiesKill,
 
 void DrawPartnerHealth(const Partner *partner) {
     if (partner->active) {
-       DrawText(TextFormat("partner_HP:%03i", partner->HP), 1300, 40, 20, RED);
+       DrawText(TextFormat("partner_HP:%03i", partner->HP), 1250, 50, 25, RED);
     }
 }

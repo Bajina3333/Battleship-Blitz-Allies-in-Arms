@@ -15,7 +15,7 @@ int Choose_Item(Player *player)
         break;
       } 
       case 2:{// machine_gun 武器升級，攻擊力+20~50
-        player->AttackPower += 20;
+        player->AttackPower += 30;
         return 2;
         break;
       } 
@@ -26,15 +26,25 @@ int Choose_Item(Player *player)
         break;
       } 
       case 4:{ //cure 補包：生命值+100
-        player->HP += 100;
+        if(player->HP +100 >= player->MaxHP){
+            player->HP = player->MaxHP;
+        }
+        else{
+            player->HP += 100;
+        }
         return 4;
         break;
       }
       case 5:{ //healing potion
      
-         player->HP += 21;
-         return 5;
-         break;
+        if(player->HP +25 >= player->MaxHP){
+                player->HP = player->MaxHP;
+            }
+            else{
+                player->HP += 25;
+            }
+        return 5;
+        break;
       }    
       case 6:{ // armor 裝甲外殼(生命值上限+100)
          player->MaxHP += 100;
