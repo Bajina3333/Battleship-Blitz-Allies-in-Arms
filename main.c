@@ -506,6 +506,7 @@ void UpdateGame(void)
         
     }
     else if(gameOver){
+        StopMusicStream(boss_music);
         StopMusicStream(level);
         PlayMusicStream(lose);
         if (is_mouse_over_button(button_start) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
@@ -591,7 +592,7 @@ void UpdateGame(void)
                         }
                         
                     }
-                    if(difficulty == MEDIUM){
+                    else if(difficulty == MEDIUM){
                         if (wave == FIRST) 
                         {
                             ResumeMusicStream(level);
@@ -617,7 +618,7 @@ void UpdateGame(void)
                         }
                         
                     }
-                    if(difficulty == HARD){
+                    else if(difficulty == HARD){
                         if (wave == FIRST) 
                         {
                             ResumeMusicStream(level);
@@ -688,6 +689,27 @@ void UpdateGame(void)
                             totalEnemies = EASY_WAVE;
                             if (!smooth)
                             {
+                                for(int i = 0; i < activeEnemies;i++){
+                                    enemy[i].active = true;
+                                        if (i < 20) {
+                                        enemy[i].type = STANDARD;
+                                        enemy[i].speed.x = 2;
+                                        enemy[i].speed.y = 2;
+                                        enemy[i].HP = 24;
+                                        enemy[i].AttackPower = 12;
+                                        enemy[i].color = GRAY;
+                                        enemy[i].frequency = 0.1;
+                                    }        
+                                    else {
+                                        enemy[i].type = STRONG;
+                                        enemy[i].speed.x = 2.5;
+                                        enemy[i].speed.y = 2.5;
+                                        enemy[i].HP = 20;
+                                        enemy[i].AttackPower = 20;
+                                        enemy[i].color = GREEN;
+                                        enemy[i].frequency = 0.1;
+                                    }
+                                }
                                 alpha += 0.02f;
 
                                 if (alpha >= 1.0f) smooth = true;
@@ -696,27 +718,7 @@ void UpdateGame(void)
                             if (smooth) alpha -= 0.02f;
                             
                             
-                            for(int i = 0; i < activeEnemies;i++){
-                                enemy[i].active = true;
-                                    if (i < 20) {
-                                    enemy[i].type = STANDARD;
-                                    enemy[i].speed.x = 2;
-                                    enemy[i].speed.y = 2;
-                                    enemy[i].HP = 24;
-                                    enemy[i].AttackPower = 12;
-                                    enemy[i].color = GRAY;
-                                    enemy[i].frequency = 0.1;
-                                }        
-                                else {
-                                    enemy[i].type = STRONG;
-                                    enemy[i].speed.x = 2.5;
-                                    enemy[i].speed.y = 2.5;
-                                    enemy[i].HP = 20;
-                                    enemy[i].AttackPower = 20;
-                                    enemy[i].color = GREEN;
-                                    enemy[i].frequency = 0.1;
-                                }
-                            }
+                            
                         } break;
                         case THIRD:
                         {
@@ -1165,7 +1167,7 @@ void UpdateGame(void)
                 if (player.rec.y + player.rec.height >= screenHeight) player.rec.y = screenHeight - player.rec.height;
 
                 // Shoot initialization
-                if (IsKeyDown(KEY_SPACE) && ShootControl<0)
+                if (IsKeyDown(KEY_SPACE) && ShootControl < 0)
                 {
                     shootRate += 5;
 
@@ -1407,9 +1409,9 @@ void DrawGame(void)
         DrawText("WELCOME TO", screenWidth/2 - MeasureText("WELCOME TO", 40)/2, 200, 40, RED);
         DrawText("Battleship Blitz: Allies in Arms", screenWidth/2 - MeasureText("Battleship Blitz: Allies in Arms", 70)/2, 340, 70, RED);
         DrawRectangleRec(button_start.rect, button_start.color);
-        DrawText("start", button_start.rect.x + button_start.rect.width / 2 - MeasureText("start", 20) / 2, button_start.rect.y + button_start.rect.height / 2 - 20 / 2, 20, WHITE);
+        DrawText("START", button_start.rect.x + button_start.rect.width / 2 - MeasureText("START", 20) / 2, button_start.rect.y + button_start.rect.height / 2 - 20 / 2, 20, WHITE);
         DrawRectangleRec(button_quit.rect, button_quit.color);
-        DrawText("quit", button_quit.rect.x + button_quit.rect.width / 2 - MeasureText("quit", 20) / 2, button_quit.rect.y + button_quit.rect.height / 2 - 20 / 2, 20, WHITE);
+        DrawText("QUIT", button_quit.rect.x + button_quit.rect.width / 2 - MeasureText("QUIT", 20) / 2, button_quit.rect.y + button_quit.rect.height / 2 - 20 / 2, 20, WHITE);
     }
     else if(gameOver)
     {
@@ -1428,7 +1430,7 @@ void DrawGame(void)
         DrawRectangleRec(button_start.rect, button_start.color);
         DrawText("RETRY", button_start.rect.x + button_start.rect.width / 2 - MeasureText("RETRY", 20) / 2, button_start.rect.y + button_start.rect.height / 2 - 20 / 2, 20, WHITE);
         DrawRectangleRec(button_quit.rect, button_quit.color);
-        DrawText("quit", button_quit.rect.x + button_quit.rect.width / 2 - MeasureText("quit", 20) / 2, button_quit.rect.y + button_quit.rect.height / 2 - 20 / 2, 20, WHITE);
+        DrawText("QUIT", button_quit.rect.x + button_quit.rect.width / 2 - MeasureText("QUIT", 20) / 2, button_quit.rect.y + button_quit.rect.height / 2 - 20 / 2, 20, WHITE);
     }else if(gamechoose)
     {
         if (is_mouse_over_button(button_1)) {
