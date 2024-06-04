@@ -1,4 +1,7 @@
 # Battleship-Blitz-Allies-in-Arms
+
+![image](https://github.com/Bajina3333/Battleship-Blitz-Allies-in-Arms/blob/main/img/part%20(1).gif)
+
 Game Introduction:
 In this game, you will first choose a player character (from three options). Each player character will be randomly paired with a partner (also from three options). Different types of partners provide various benefits to the player, such as increased speed or enhanced attack abilities. The partner will follow the player and shoot automatically.
 
